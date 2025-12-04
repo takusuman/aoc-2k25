@@ -40,6 +40,7 @@ count() {
 
 n=0
 current_point=50
+exec 5<&0 <"$input"
 while read l; do
 	num=`echo $l | tr -d 'LR'`
 	case "$l" in
@@ -58,5 +59,6 @@ while read l; do
 	current_point=`expr \( $current_point + 100 \)`
 	current_point=`expr \( $current_point % 100 \)`
 	n=`count $times_around_the_dial`
-done < "$input"
+done
+exec <&5 5<&-
 printf 'Upa!%.0s\n' $n
