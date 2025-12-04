@@ -28,50 +28,17 @@
 
 input="$1"
 shift
-abs() {
-	num="$1"
-	if [ $num -lt 0 ]; then
-		printf '( %d * -1 )\n' "$1" | bc
-	else
-		printf '%d' "$num"
-	fi
-}
-
-ceil() {
-	# Treat the input as an integer
-	# because sh(1)'s test is dumb.
-	i=`printf '%.2f' $1`
-	iint=`printf '%s' "$i" | cut -d. -f1`
-	if [ $iint -lt 0  ] || [ "`printf '%s' "$i"`" \= "`printf '%.2f' $iint`" ]; then
-		printf '%d' $iint
-	else
-		expr $iint + 1
-	fi
-}
 
 count() {
 	n=$1
 	c=${2:-0}
-	while [ $c -ne $n ]; do
+	while [ $c -lt $n ]; do
 		c=`expr $c + 1`
-		echo $c
+		printf '%d\n' $c
 	done
 }
 
-mod_arithmetic() {
-	initial="$1"
-	threshold="$2"
-	current_point="$3"
-	expression="$4"
-
-	r=`expr $initial + \( \( $current_point + $expression \) $res % $threshold \)`
-	if [ $r -lt "$initial" ]; then
-		current_point=`expr "$r" + "$threshold"`
-		r=`mod_arithmetic "$initial" "$threshold" "$current_point" 0`
-	fi
-	printf '%d' "$r"
-}
-
+n=0
 current_point=50
 while read l; do
 	num=`echo $l | tr -d 'LR'`
@@ -79,32 +46,17 @@ while read l; do
 		L*) click="-$num";;
 		R*) click="$num";;
 	esac
-	prev_current_point=$current_point
-	result=`mod_arithmetic 0 100 $current_point "$click"`
-	echo $result
-	current_point=$result
-
-	if [ $click -lt 0 ]; then
-		delta="$prev_current_point - $num"
-	else
-		delta="$num - $prev_current_point"
-	fi
-	times_around_the_dial=`expr \( $delta \) / 100`
-	times_around_the_dial=`abs $times_around_the_dial`
-	if [ `expr \( $delta \) % 100` -ne $result ] \
-		&& [ $prev_current_point -gt 0 ] && [ $prev_current_point -lt 100 ] \
-		&& [ $result -ne 0 ]; then
+	printf '%d\n' $click
+	mod_click=`expr \( $click % 100 \)`
+	times_around_the_dial=`expr ${times_around_the_dial:-0} + \( $num / 100 \)`
+	current_point=`expr \( $current_point + $mod_click \)`
+	if [ $current_point -ge 100 ] || \
+		([ $current_point -lt 0 ] && [ $current_point -ne $mod_click ]) || \
+		[ $current_point -eq 0 ]; then
 		times_around_the_dial=`expr $times_around_the_dial + 1`
 	fi
-
-	if [ $result -eq 0 ] && [ "${times_around_the_dial:-0}" -eq 0 ]; then
-		echo Upa!
-	fi
-
-	if [ "${times_around_the_dial:-0}" -ne 0 ]; then
-		[ $result -eq 0 ] && times_around_the_dial=`expr $times_around_the_dial + 1`
-		printf 'Upa! De novo!%.0s\n' `count $times_around_the_dial`
-	fi
-
-	unset num pos click result click_and_pcp times_around_the_dial
+	current_point=`expr \( $current_point + 100 \)`
+	current_point=`expr \( $current_point % 100 \)`
+	n=`count $times_around_the_dial`
 done < "$input"
+printf 'Upa!%.0s\n' $n
