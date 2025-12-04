@@ -38,7 +38,6 @@ count() {
 	done
 }
 
-n=0
 current_point=50
 exec 5<&0 <"$input"
 while read l; do
@@ -58,7 +57,6 @@ while read l; do
 	fi
 	current_point=`expr \( $current_point + 100 \)`
 	current_point=`expr \( $current_point % 100 \)`
-	n=`count $times_around_the_dial`
 done
 exec <&5 5<&-
-printf 'Upa!%.0s\n' $n
+printf 'Upa!%.0s\n' `count $times_around_the_dial`
