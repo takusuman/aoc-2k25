@@ -83,10 +83,6 @@ while read l; do
 	result=`mod_arithmetic 0 100 $current_point "$click"`
 	echo $result
 	current_point=$result
-	if [ $result -eq 0 ]; then
-		echo Upa!
-		continue
-	fi
 
 	if [ $click -lt 0 ]; then
 		delta="$prev_current_point - $num"
@@ -96,11 +92,19 @@ while read l; do
 	times_around_the_dial=`expr \( $delta \) / 100`
 	times_around_the_dial=`abs $times_around_the_dial`
 	if [ `expr \( $delta \) % 100` -ne $result ] \
-		&& [ $prev_current_point -gt 0 ] && [ $prev_current_point -lt 100 ]; then
+		&& [ $prev_current_point -gt 0 ] && [ $prev_current_point -lt 100 ] \
+		&& [ $result -ne 0 ]; then
 		times_around_the_dial=`expr $times_around_the_dial + 1`
 	fi
 
-	[ "${times_around_the_dial:-0}" -ne 0 ] && \
+	if [ $result -eq 0 ] && [ "${times_around_the_dial:-0}" -eq 0 ]; then
+		echo Upa!
+	fi
+
+	if [ "${times_around_the_dial:-0}" -ne 0 ]; then
+		[ $result -eq 0 ] && times_around_the_dial=`expr $times_around_the_dial + 1`
 		printf 'Upa! De novo!%.0s\n' `count $times_around_the_dial`
+	fi
+
 	unset num pos click result click_and_pcp times_around_the_dial
 done < "$input"
