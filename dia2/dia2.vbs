@@ -3,34 +3,43 @@
 '
 '
 
+Function IDRangeToArray(IDRange)
+	Dim ProductIDRanges(1)
+	CurID = 0
+	For j = 1 To Len(IDRange)
+		IDChr = Mid(IDRange, j, 1)
+		If ( IDChr = "-" ) Then
+			CurID = CurID + 1 ' expr vibes
+		ElseIf ( IDChr <> "-" ) Then
+			ProductIDRanges(CurID) = ProductIDRanges(CurID) & IDChr
+		End If
+	Next
+	IDRange = ""
+	IDChr = ""	
+	IDRangeToArray = ProductIDRanges
+	Erase ProductIDRanges
+End Function
+
 Function ParseProductsIDRanges(line)
-	Dim ProductIDRanges(1), IDRangeList, NIDRangeList, i, j, LChr, IDChr, IDRange, CurID
+	Dim ProductIDRanges, IDRangeList, NIDRangeList, _
+		LenLine, i, j, LChr, IDChr, IDRange, CurID
+	LenLine = Len(line)
 	NIDRangeList = 0
 	Set IDRangeList = CreateObject("Scripting.Dictionary")
-	WScript.Echo Len(line)
-	
-	For i = 1 To Len(line)
+	For i = 1 To LenLine
 		LChr = Mid(line, i, 1)
 		If ( LChr <> "," ) Then
 			IDRange = IDRange & LChr
+			' Handle last value before end of string.
+			If ( i = LenLine ) Then
+				ProductIDRanges = IDRangeToArray(IDRange)
+				IDRangeList.Add NIDRangeList, ProductIDRanges
+			End If
 		Else
-			WScript.Echo(IDRange)
-			CurID = 0
-			For j = 1 To Len(IDRange)
-				IDChr = Mid(IDRange, j, 1)
-				If ( IDChr = "-" ) Then
-					CurID = CurID + 1 ' expr vibes
-				ElseIf ( IDChr <> "-" ) Then
-					ProductIDRanges(CurID) = ProductIDRanges(CurID) & IDChr
-				End If
-			Next
+			ProductIDRanges = IDRangeToArray(IDRange)
 			IDRangeList.Add NIDRangeList, ProductIDRanges
 			NIDRangeList = NIDRangeList + 1
-			Erase ProductIDRanges
-			IDRange = ""
-			IDChr = ""
 		End If
-		WScript.Echo i
 	Next
 	Set ParseProductsIDRanges = IDRangeList
 End Function
