@@ -19,50 +19,71 @@
 Function CheckIfItsRepeated(number)
 	Dim LenNumberString
 	LenNumberString = Len(number)
-	If ((LenNumberString Mod 2) = 0) Then
-		Dim FstPart, SndPart
-		FstPart = Mid(number, 1, (LenNumberString/2))
-		SndPart = Mid(number, ((LenNumberString/2) + 1), LenNumberString)
-		If ( FstPart = SndPart ) Then
-			CheckIfItsRepeated = True
+	Dim CurPart, PrevPart, Factor, LenPerFactor, _
+		c, i, j, ActualEdgeCase
+	' We will start from the factor that
+	' has the largest quotient, so we iter
+	' the least amount of times possible.
+	' I won't say that we "save cycles" because,
+	' well, I don't know how Mid() is, in fact,
+	' implemented.
+	' The exeption is Mod 2, since we don't want
+	' to make cases where 3 would be optimal slower.
+	' Damn, VBS is already slow.
+	Select Case 0
+		Case (LenNumberString Mod 3)
+			Factor = 3
+		Case (LenNumberString Mod 5)
+			Factor = 5
+		Case (LenNumberString Mod 7)
+			Factor = 7
+		Case (LenNumberString Mod 2)
+			Factor = 2
+		Case Else
+			' Just in case, iter one-per-one.
+			' Perhaps I'm paranoic about edge-cases,
+			' but we can never know, eh?
+			Factor = LenNumberString
+	End Select
+
+	LenPerFactor = (LenNumberString / Factor)
+	
+	For c = 1 To LenNumberString Step LenPerFactor
+		CurPart = Mid(number, c, LenPerFactor)
+		If (PrevPart = "") Then
+			PrevPart = CurPart
+		End If
+		If (CurPart <> PrevPart) Then
+			ActualEdgeCase = False
+			' Handle edge cases such as 2121212121,
+			' which can't be handled per the old algorithm.
+			If ((LenNumberString Mod 2) = 0) Then
+				Dim Mod2CurPart, Mod2PrevPart
+				For i = 2 To LenPerFactor ' Divided per 2.
+					For j = 1 To LenNumberString Step i
+						Mod2CurPart = Mid(number, j, i)
+						If (Mod2PrevPart = "") Then
+							Mod2PrevPart = Mod2CurPart
+						End If
+						If (Mod2CurPart <> Mod2PrevPart) Then
+							ActualEdgeCase = False ' Keep it false.
+							Exit For
+						End If
+						Mod2CurPart = ""
+						Mod2PrevPart = ""
+						ActualEdgeCase = True ' All good, man.
+					Next
+				Next
+			End If
+			' And the pattern has just been broken!
+			' This in case of a 11223 type number.
+			CheckIfItsRepeated = ActualEdgeCase
 			Exit Function
 		End If
-	Else
-		Dim CurPart, PrevPart, Factor, LenPerFactor, c 
-		' We will start from the factor that
-		' has the largest quotient, so we iter
-		' the least amount of times possible.
-		' I won't say that we "save cycles" because,
-		' well, I don't know how Mid() is, in fact,
-		' implemented.
-		Select Case (0)
-			Case (LenNumberString % 3)
-				Factor = 3
-			Case (LenNumberString % 5)
-				Factor = 5
-			Case (LenNumberString % 7)
-				Factor = 7
-			Case Else
-				' Just in case, iter one-per-one.
-				' Perhaps I'm paranoic about edge-cases,
-				' but we can never know, eh?
-				Factor = LenNumberString
-		End Select
-		
-		LenPerFactor = (LenNumberString / Factor)
-		For c To LenNumberString Step LenPerFactor
-			CurPart = Mid(number, c, LenPerFactor)
-			If (CurPart <> PrevPart) Then
-				' And the pattern has just been broken!
-				' This in case of a 11223 type number.
-				CheckIfItsRepeated = False
-				Exit Function
-			End If
-			PrevPart = CurPart
-			CurPart = ""
-		Next
-	End If
-	CheckIfItsRepeated = False
+		PrevPart = CurPart
+		CurPart = ""
+	Next
+	CheckIfItsRepeated = True
 End Function
 
 Function IDRangeToArray(IDRange)
