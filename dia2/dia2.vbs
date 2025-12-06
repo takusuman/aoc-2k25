@@ -4,12 +4,13 @@
 '
 
 Function ParseProductsIDRanges(line)
-	Dim ProductIDRanges(2), IDRangeList, i, j, LChr, IDChr, IDRange, CurID
-	Set IDRangeList = CreateObject("System.Collections.ArrayList")
+	Dim ProductIDRanges(1), IDRangeList, NIDRangeList, i, j, LChr, IDChr, IDRange, CurID
+	NIDRangeList = 0
+	Set IDRangeList = CreateObject("Scripting.Dictionary")
 	For i = 1 To Len(line)
 		LChr = Mid(line, i, 1)
 		If ( LChr = "," ) Then
-		    CurID = 0
+			CurID = 0
 			For j = 1 To Len(IDRange)
 				IDChr = Mid(IDRange, j, 1)
 				If ( IDChr = "-" ) Then
@@ -18,16 +19,16 @@ Function ParseProductsIDRanges(line)
 					ProductIDRanges(CurID) = ProductIDRanges(CurID) & IDChr
 				End If
 			Next
-
-			IDRangeList.Add ProductIDRanges
-			ProductIDRanges = Nothing
-			IDRange = Nothing
-			IDChr = Nothing
+			IDRangeList.Add NIDRangeList, ProductIDRanges
+			NIDRangeList = NIDRangeList + 1
+			Erase ProductIDRanges
+			IDRange = ""
+			IDChr = ""
 		Else
 			IDRange = IDRange & LChr
 		End If
 	Next
-	ParseProductsIDRanges = IDRangeList
+	Set ParseProductsIDRanges = IDRangeList
 End Function
 
 Const ForReading = 1
