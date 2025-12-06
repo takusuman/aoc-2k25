@@ -1,7 +1,27 @@
 ' AoC 2k25, day 2 pt. 1 in VBScript.
 ' Question statement:
-'
-'
+' "Since the young Elf was just doing silly patterns,
+' you can find the invalid IDs by looking for any ID
+' which is made only of some sequence of digits repeated
+' twice. So, 55 (5 twice), 6464 (64 twice), and 123123
+' (123 twice) would all be invalid IDs.
+' None of the numbers have leading zeroes; 0101 isn't
+' an ID at all. (101 is a valid ID that you would ignore.)"
+' Personal taks' note: Where could 0101 be a case? Hmmm...
+
+Function CheckIfItsRepeated(number)
+	Dim LenNumberString, FstPart, SndPart
+	LenNumberString = Len(number)
+	If (Not ((LenNumberString Mod 2) = 0)) Then
+		CheckIfItsRepeated = False
+		Exit Function
+	End If
+	FstPart = Mid(number, 1, (LenNumberString/2))
+	SndPart = Mid(number, ((LenNumberString/2) + 1), LenNumberString)
+	If ( FstPart = SndPart ) Then
+		CheckIfItsRepeated = True
+	End If
+End Function
 
 Function IDRangeToArray(IDRange)
 	Dim ProductIDRanges(1)
@@ -46,7 +66,8 @@ End Function
 
 Const ForReading = 1
 Dim inputFile, FileObject, FILE
-Dim IDRanges, IDPair, i, j, k
+Dim IDRanges, NIDRanges, IDPair, IsRepeated, _
+	RepeatedSum, i, k
 
 inputFile = WScript.Arguments.Item(0)
 Set FileObject = CreateObject("Scripting.FileSystemObject")
@@ -56,24 +77,24 @@ Set FILE = FileObject.OpenTextFile(inputFile)
 ' iterating over the file.
 
 l = FILE.ReadLine()
-
 WScript.Echo l
 
-' Debug
 Set IDRanges = ParseProductsIDRanges(l)
-WScript.Echo "Number of ID pairs: " & IDRanges.Count
-
-For i = 0 To (IDRanges.Count - 1)
+NIDRanges = (IDRanges.Count - 1)
+WScript.Echo "Number of ID pairs: " & NIDRanges
+For i = 0 To NIDRanges
     IDPair = IDRanges(i)
-    WScript.Echo "Item " & i & ": "
-
-    For j = 0 To UBound(IDPair)
-        WScript.Echo "  [" & j & "] = " & IDPair(j)
-    Next
-	
 	For k = IDPair(0) To IDPair(1)
 		WScript.Echo k
+		IsRepeated = CheckIfItsRepeated(CStr(k))
+		If ( IsRepeated ) Then
+			WScript.Echo "Repetido!"
+			RepeatedSum = RepeatedSum + k
+		End If
 	Next
 Next
+WScript.Echo "Repetidos: " & RepeatedSum
 
 FILE.Close()
+Set FILE = Nothing
+Set FileObject = Nothing
