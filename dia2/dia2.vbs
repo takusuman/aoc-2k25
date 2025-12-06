@@ -7,9 +7,14 @@ Function ParseProductsIDRanges(line)
 	Dim ProductIDRanges(1), IDRangeList, NIDRangeList, i, j, LChr, IDChr, IDRange, CurID
 	NIDRangeList = 0
 	Set IDRangeList = CreateObject("Scripting.Dictionary")
+	WScript.Echo Len(line)
+	
 	For i = 1 To Len(line)
 		LChr = Mid(line, i, 1)
-		If ( LChr = "," ) Then
+		If ( LChr <> "," ) Then
+			IDRange = IDRange & LChr
+		Else
+			WScript.Echo(IDRange)
 			CurID = 0
 			For j = 1 To Len(IDRange)
 				IDChr = Mid(IDRange, j, 1)
@@ -24,16 +29,15 @@ Function ParseProductsIDRanges(line)
 			Erase ProductIDRanges
 			IDRange = ""
 			IDChr = ""
-		Else
-			IDRange = IDRange & LChr
 		End If
+		WScript.Echo i
 	Next
 	Set ParseProductsIDRanges = IDRangeList
 End Function
 
 Const ForReading = 1
 Dim inputFile, FileObject, FILE
-Dim result, arr, i, j
+Dim IDRanges, IDPair, i, j, k
 
 inputFile = WScript.Arguments.Item(0)
 Set FileObject = CreateObject("Scripting.FileSystemObject")
@@ -47,17 +51,20 @@ l = FILE.ReadLine()
 WScript.Echo l
 
 ' Debug
-Set result = ParseProductsIDRanges(l)
+Set IDRanges = ParseProductsIDRanges(l)
+WScript.Echo "Number of ID pairs: " & IDRanges.Count
 
-WScript.Echo "Count: " & result.Count
-
-For i = 0 To result.Count - 1
-    arr = result(i)
+For i = 0 To (IDRanges.Count - 1)
+    IDPair = IDRanges(i)
     WScript.Echo "Item " & i & ": "
 
-    For j = 0 To UBound(arr)
-        WScript.Echo "  [" & j & "] = " & arr(j)
+    For j = 0 To UBound(IDPair)
+        WScript.Echo "  [" & j & "] = " & IDPair(j)
     Next
+	
+	For k = IDPair(0) To IDPair(1)
+		WScript.Echo k
+	Next
 Next
 
 FILE.Close()
