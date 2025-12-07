@@ -31,10 +31,15 @@ Function ParseProductsIDRanges(line)
 End Function
 
 Function CheckIfItsRepeated(number)
-	Dim LenNumberString, LenPerFactor
+	Dim CurPart, PrevPart, Factor, _
+		LenNumberString, LenPerFactor, c
 	LenNumberString = Len(number)
 
-	Dim CurPart, PrevPart, Factor, c
+	' For single-digit numbers. Yes, this was necessary.
+	If (LenNumberString = 1) Then
+		CheckIfItsRepeated = False
+	End If
+
 	' We will start from the factor that
 	' has the largest quotient, so we iter
 	' the least amount of times possible.
