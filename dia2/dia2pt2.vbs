@@ -30,29 +30,6 @@ Function ParseProductsIDRanges(line)
 	ParseProductsIDRanges = IDRangeList
 End Function
 
-' Not checking for errors on this one.
-' Keep this in mind if you're making
-' something derived from this and using it.
-
-Function SplitStringPerRange(text, n)
-    Dim i, cnt, result()
-
-    'If n <= 0 Then
-    '    Err.Raise vbObjectError + 1000, , "Chunk size must be > 0"
-    'End If
-
-    ' Pre-allocate worst case size
-    ReDim result((Len(text) + n - 1) \ n - 1)
-
-    cnt = 0
-    For i = 1 To Len(text) Step n
-        result(cnt) = Mid(text, i, n)
-        cnt = cnt + 1
-    Next
-
-    SplitStringPerRange = result
-End Function
-
 Function CheckIfItsRepeated(number)
 	Dim LenNumberString, LenPerFactor
 	LenNumberString = Len(number)
@@ -93,15 +70,11 @@ Function CheckIfItsRepeated(number)
 				LenPerFactor = (LenNumberString / Factor)
 				FstPart = Mid(number, 1, LenPerFactor)
 				SndPart = Mid(number, (LenPerFactor + 1), LenNumberString)
-				If (number = 1188511885) Then
-					WScript.Echo FstPart, SndPart
-				End If
 				If (FstPart = SndPart) Then
 					CheckIfItsRepeated = True
 					Exit Function
 				Else
-					Dim ActualEdgeCase, NumberInPieces, FstElem, k
-					ActualEdgeCase = True					
+					Dim FstElem, k
 					' Handle edge cases such as 2121212121, which
 					' is 5 times a two-digit number, which can't
 					' be handled per the old algorithm.
