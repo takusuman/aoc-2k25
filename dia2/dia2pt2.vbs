@@ -38,6 +38,7 @@ Function CheckIfItsRepeated(number)
 	' For single-digit numbers. Yes, this was necessary.
 	If (LenNumberString = 1) Then
 		CheckIfItsRepeated = False
+		Exit Function
 	End If
 
 	' We will start from the factor that
