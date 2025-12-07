@@ -15,126 +15,120 @@
 ' times), 123123123 (123 three times), 1212121212 (12 five
 ' times), and 1111111 (1 seven times) are all invalid IDs."
 
+Function ParseProductsIDRanges(line)
+	Dim ProductIDRanges, IDRange, IDRangeList, CrudeIDRanges, i
+	CrudeIDRanges = Split(line, ",")
+	IDRangeList = Array()
+	For i = 0 To UBound(CrudeIDRanges)
+		ReDim Preserve IDRangeList(UBound(IDRangeList) + 1)
+		IDRange = CrudeIDRanges(i)
+		ProductIDRanges	= Split(IDRange, "-")
+		WScript.Echo ProductIDRanges(0), ProductIDRanges(1)
+		IDRangeList(UBound(IDRangeList)) = ProductIDRanges
+		IDRange = ""
+	Next
+	ParseProductsIDRanges = IDRangeList
+End Function
+
+' Not checking for errors on this one.
+' Keep this in mind if you're making
+' something derived from this and using it.
+
+Function SplitStringPerRange(text, n)
+    Dim i, cnt, result()
+
+    'If n <= 0 Then
+    '    Err.Raise vbObjectError + 1000, , "Chunk size must be > 0"
+    'End If
+
+    ' Pre-allocate worst case size
+    ReDim result((Len(text) + n - 1) \ n - 1)
+
+    cnt = 0
+    For i = 1 To Len(text) Step n
+        result(cnt) = Mid(text, i, n)
+        cnt = cnt + 1
+    Next
+
+    SplitStringPerRange = result
+End Function
 
 Function CheckIfItsRepeated(number)
 	Dim LenNumberString, LenPerFactor
 	LenNumberString = Len(number)
 
-	If ((LenNumberString Mod 2) = 0) Then
-		Dim FstPart, SndPart
-		LenPerFactor = (LenNumberString/2)
-		FstPart = Mid(number, 1, LenPerFactor)
-		SndPart = Mid(number, (LenPerFactor + 1), LenNumberString)
-		If (FstPart = SndPart) Then
-			CheckIfItsRepeated = True
-			Exit Function
-		Else
-			' Handle edge cases such as 2121212121,
-			' which can't be handled per the old algorithm.
-			Dim Mod2CurPart, Mod2PrevPart, i, j, ActualEdgeCase, _
-				IndeedNotAnActualEdgeCase
-			ActualEdgeCase = False
-			For i = 2 To LenPerFactor ' Divided per 2.
-				For j = 1 To LenNumberString Step i
-					Mod2CurPart = Mid(number, j, i)
-					If (Mod2PrevPart = "") Then
-						Mod2PrevPart = Mod2CurPart
-					End If
-					If (Mod2CurPart <> Mod2PrevPart) Then
-						ActualEdgeCase = False ' Keep it false.
-						IndeedNotAnActualEdgeCase = True
-					End If
-					If (Not IndeedNotAnActualEdgeCase) Then
-						Mod2CurPart = ""
-						Mod2PrevPart = ""
-						ActualEdgeCase = True ' All good, man.
-					End If
-				Next
-			Next
-			CheckIfItsRepeated = ActualEdgeCase
-			Exit Function
-		End If
-	Else
-		Dim CurPart, PrevPart, Factor, c
-		' We will start from the factor that
-		' has the largest quotient, so we iter
-		' the least amount of times possible.
-		' I won't say that we "save cycles" because,
-		' well, I don't know how Mid() is, in fact,
-		' implemented.
-		Select Case 0
-			Case (LenNumberString Mod 3)
-				Factor = 3
-			Case (LenNumberString Mod 5)
-				Factor = 5
-			Case (LenNumberString Mod 7)
-				Factor = 7
-			Case Else
-				' Just in case, iter one-per-one.
-				' Perhaps I'm paranoic about edge-cases,
-				' but we can never know, eh?
-				Factor = LenNumberString
-		End Select
+	Dim CurPart, PrevPart, Factor, c
+	' We will start from the factor that
+	' has the largest quotient, so we iter
+	' the least amount of times possible.
+	' I won't say that we "save cycles" because,
+	' well, I don't know how Mid() is, in fact,
+	' implemented.
+	Select Case 0
+		Case (LenNumberString Mod 3)
+			Factor = 3
+		Case (LenNumberString Mod 5)
+			Factor = 5
+		Case (LenNumberString Mod 7)
+			Factor = 7
+		Case Else
+			' Just in case, iter one-per-one.
+			' Perhaps I'm paranoic about edge-cases,
+			' but we can never know, eh?
+			' Don't be preoccupied, we'll be handling
+			' the Mod 2 below for sure.
+			Factor = LenNumberString
+	End Select
 
-		LenPerFactor = (LenNumberString / Factor)
-		
-		For c = 1 To LenNumberString Step LenPerFactor
-			CurPart = Mid(number, c, LenPerFactor)
-			If (PrevPart = "") Then
-				PrevPart = CurPart
-			End If
-			If (CurPart <> PrevPart) Then
-				' And the pattern has just been broken!
-				' This in case of a 11223 type number.
-				CheckIfItsRepeated = False
-				Exit Function
-			End If
+	LenPerFactor = (LenNumberString / Factor)
+	For c = 1 To LenNumberString Step LenPerFactor
+		CurPart = Mid(number, c, LenPerFactor)
+		If (PrevPart = "") Then
 			PrevPart = CurPart
-			CurPart = ""
-		Next
-	End If
-	CheckIfItsRepeated = True
-End Function
-
-Function IDRangeToArray(IDRange)
-	Dim ProductIDRanges(1)
-	CurID = 0
-	For j = 1 To Len(IDRange)
-		IDChr = Mid(IDRange, j, 1)
-		If ( IDChr = "-" ) Then
-			CurID = CurID + 1 ' expr vibes
-		ElseIf ( IDChr <> "-" ) Then
-			ProductIDRanges(CurID) = ProductIDRanges(CurID) & IDChr
 		End If
-	Next
-	IDRange = ""
-	IDChr = ""
-	IDRangeToArray = ProductIDRanges
-	Erase ProductIDRanges
-End Function
-
-Function ParseProductsIDRanges(line)
-	Dim ProductIDRanges, IDRangeList, NIDRangeList, _
-		LenLine, i, j, LChr, IDChr, IDRange, CurID
-	LenLine = Len(line)
-	NIDRangeList = 0
-	Set IDRangeList = CreateObject("Scripting.Dictionary")
-	For i = 1 To LenLine
-		LChr = Mid(line, i, 1)
-		If ( LChr <> "," ) Then
-			IDRange = IDRange & LChr
-			' Handle last value before end of string.
-			If ( i = LenLine ) Then
-				ProductIDRanges = IDRangeToArray(IDRange)
-				IDRangeList.Add NIDRangeList, ProductIDRanges
+		If (CurPart <> PrevPart) Then
+			If ((LenNumberString Mod 2) = 0) Then
+				Dim FstPart, SndPart
+				Factor = 2
+				LenPerFactor = (LenNumberString / Factor)
+				FstPart = Mid(number, 1, LenPerFactor)
+				SndPart = Mid(number, (LenPerFactor + 1), LenNumberString)
+				If (number = 1188511885) Then
+					WScript.Echo FstPart, SndPart
+				End If
+				If (FstPart = SndPart) Then
+					CheckIfItsRepeated = True
+					Exit Function
+				Else
+					Dim ActualEdgeCase, NumberInPieces, FstElem, k
+					ActualEdgeCase = True					
+					' Handle edge cases such as 2121212121, which
+					' is 5 times a two-digit number, which can't
+					' be handled per the old algorithm.
+					Select Case LenPerFactor
+						Case 5
+							Factor = 2
+						Case Else
+							Factor = 1
+					End Select
+					FstElem = Mid(number, 1, Factor)
+					For k = (Factor + 1) To Len(number) Step Factor
+						If (FstElem <> Mid(number, k, Factor)) Then
+							CheckIfItsRepeated = False
+							Exit Function
+						End If
+					Next
+				End If
 			End If
-		Else
-			ProductIDRanges = IDRangeToArray(IDRange)
-			IDRangeList.Add NIDRangeList, ProductIDRanges
-			NIDRangeList = NIDRangeList + 1
+			' And the pattern has just been broken!
+			' This in case of a 11223 type number.
+			CheckIfItsRepeated = False
+			Exit Function
 		End If
+		PrevPart = CurPart
+		CurPart = ""
 	Next
-	Set ParseProductsIDRanges = IDRangeList
+	CheckIfItsRepeated = True
 End Function
 
 Const ForReading = 1
@@ -152,8 +146,9 @@ Set FILE = FileObject.OpenTextFile(inputFile)
 l = FILE.ReadLine()
 WScript.Echo l
 
-Set IDRanges = ParseProductsIDRanges(l)
-NIDRanges = (IDRanges.Count - 1)
+IDRanges = ParseProductsIDRanges(l)
+
+NIDRanges = (UBound(IDRanges))
 WScript.Echo "Number of ID pairs: " & NIDRanges
 For i = 0 To NIDRanges
     IDPair = IDRanges(i)
