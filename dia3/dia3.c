@@ -32,10 +32,12 @@ int main(int argc, char *argv[]) {
 	unsigned int banks = 0,
 		     bufsiz = 5;
 	int8_t battery = 0,
+	       first_largest = 0,
+	       second_largest = 0,
+	       *mostpowerfulofbank = NULL,
 	       *bankbuf = NULL,
 		**totalbanks,
-		**newtotalbanks,
-		batterypack[2] = {0, 0};
+		**newtotalbanks;	
 	char *input = NULL;
 	FILE *inputfp = NULL;
 
@@ -59,7 +61,11 @@ int main(int argc, char *argv[]) {
 		totalbanks[banks] = bankbuf;
 	}
 
+	if ((mostpowerfulofbank = malloc(banks)) == NULL)
+		return -1;
+
 	for (int i = 0; i < banks; i++) {
+		printf("Bank %d: ", i);
 		for (int j = 0; ; j++) {
 			battery = totalbanks[i][j];
 			switch (battery) {
@@ -72,9 +78,15 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		}
+		/*
+		 * mostpowerfulofbank[i] = ((first_largest * 10) + second_largest);
+		 * printf("Largest batteries of the bank: %d\n",
+		 * 	mostpowerfulofbank[i]);
+		 */
 	}
 
 	free(totalbanks);
+	free(mostpowerfulofbank);
 	fclose(inputfp);
 	return 0;
 }
@@ -87,7 +99,7 @@ int8_t *getbatterybank(FILE *f) {
 	int b = 0;
 	bank = malloc(bufsiz);
 
-	for (l = 0; (b = getc(f)) != NULL; l++) {
+	for (l = 0; (b = getc(f)); l++) {
 		if ((l + 1) > bufsiz) {
 			/*
 			 * We shouldn't be goign too far if
