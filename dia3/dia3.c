@@ -34,7 +34,7 @@ int8_t *getbatterybank(FILE *f);
 int main(int argc, char *argv[]) {
 	unsigned int banks = 0,
 		     banklen = 0,
-		     bufsiz = 200,
+		     bufsiz = 5,
 		     first_largest_pos = 0,
 		     second_largest_pos = 0,
 		     sum = 0,
@@ -61,10 +61,8 @@ int main(int argc, char *argv[]) {
 
 	for (banks = 0; (bankbuf = getbatterybank(inputfp)) != NULL; banks++) {
 		if ((banks + 1)	> bufsiz) {
-			bufsiz /= sizeof(int *);
 			bufsiz += 5;
-			bufsiz *= sizeof(int *);
-			if ((newtotalbanks = realloc(totalbanks, bufsiz)) == NULL) {
+			if ((newtotalbanks = realloc(totalbanks, (bufsiz * sizeof(int *)))) == NULL) {
 				return -1;
 			} else {
 			        totalbanks = newtotalbanks;
