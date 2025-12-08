@@ -25,7 +25,10 @@
  */
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 int8_t *getbatterybank(FILE *f);
 
 int main(int argc, char *argv[]) {
@@ -40,7 +43,7 @@ int main(int argc, char *argv[]) {
 	       *mostpowerfulofbank = NULL,
 	       *bankbuf = NULL,
 	       **totalbanks,
-	       **newtotalbanks;	
+	       **newtotalbanks;
 	char *input = NULL;
 	FILE *inputfp = NULL;
 
@@ -53,8 +56,10 @@ int main(int argc, char *argv[]) {
 		return -1;
 
 	for (banks = 0; (bankbuf = getbatterybank(inputfp)) != NULL; banks++) {
-		if ((banks + 1)	> 5) {
+		if ((banks + 1)	> bufsiz) {
+			bufsiz /= sizeof(int *);
 			bufsiz += 5;
+			bufsiz *= sizeof(int *);
 			if ((newtotalbanks = realloc(totalbanks, bufsiz)) == NULL) {
 				return -1;
 			} else {
