@@ -88,10 +88,9 @@ int main(int argc, char *argv[]) {
 				first_largest_pos = j;
 				for (int k = (first_largest_pos + 1); k < banklen; k++) {
 					battery = totalbanks[i][k];
-					if (second_largest < battery || second_largest_pos < first_largest_pos) {
+					if (second_largest < battery || second_largest_pos <= first_largest_pos) {
 						second_largest = battery;
 						second_largest_pos = k;
-						break;
 					}
 				}
 			}
