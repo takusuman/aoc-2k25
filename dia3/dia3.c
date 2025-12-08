@@ -1,5 +1,5 @@
 /*
- * AoC 2k25, day 3 in C99.
+ * AoC 2k25, day 3 pt. 1 in C99.
  * Question statement: "You descend a short staircase,
  * enter the surprisingly vast lobby, and are quickly
  * cleared by the security checkpoint. When you get
