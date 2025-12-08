@@ -30,14 +30,17 @@ int8_t *getbatterybank(FILE *f);
 
 int main(int argc, char *argv[]) {
 	unsigned int banks = 0,
-		     bufsiz = 5;
+		     banklen = 0,
+		     bufsiz = 5,
+		     first_largest_pos = 0,
+		     second_largest_pos = 0;
 	int8_t battery = 0,
-	       first_largest = 0,
-	       second_largest = 0,
+	       first_largest = 1,
+	       second_largest = 1,
 	       *mostpowerfulofbank = NULL,
 	       *bankbuf = NULL,
-		**totalbanks,
-		**newtotalbanks;	
+	       **totalbanks,
+	       **newtotalbanks;	
 	char *input = NULL;
 	FILE *inputfp = NULL;
 
@@ -66,8 +69,8 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < banks; i++) {
 		printf("Bank %d: ", i);
-		for (int j = 0; ; j++) {
-			battery = totalbanks[i][j];
+		for (banklen = 0; ; banklen++) {
+			battery = totalbanks[i][banklen];
 			switch (battery) {
 				case -1:
 					putchar('\n');
@@ -78,11 +81,30 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		}
-		/*
-		 * mostpowerfulofbank[i] = ((first_largest * 10) + second_largest);
-		 * printf("Largest batteries of the bank: %d\n",
-		 * 	mostpowerfulofbank[i]);
-		 */
+		for (int j = 0; j < (banklen - 1); j++) {
+			battery = totalbanks[i][j];
+			if (first_largest < battery) {
+				first_largest = battery;
+				first_largest_pos = j;
+				for (int k = (first_largest_pos + 1); k < banklen; k++) {
+					battery = totalbanks[i][k];
+					if (second_largest < battery || second_largest_pos < first_largest_pos) {
+						second_largest = battery;
+						second_largest_pos = k;
+						break;
+					}
+				}
+			}
+		}
+		printf("First largest: %d\nSecond largest: %d\n",
+				first_largest, second_largest);
+		mostpowerfulofbank[i] = ((first_largest * 10) + second_largest);
+		printf("Largest batteries of the bank: %d\n",
+				mostpowerfulofbank[i]);
+		first_largest = 1;
+		second_largest = 1;
+		first_largest_pos = 0;
+		second_largest_pos = 0;
 	}
 
 	free(totalbanks);
