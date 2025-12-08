@@ -34,9 +34,13 @@ int8_t *getbatterybank(FILE *f);
 int main(int argc, char *argv[]) {
 	unsigned int banks = 0,
 		     banklen = 0,
-		     bufsiz = 5,
+		     bufsiz = 200,
 		     first_largest_pos = 0,
-		     second_largest_pos = 0;
+		     second_largest_pos = 0,
+		     sum = 0,
+		     i = 0,
+		     j = 0,
+		     k = 0;
 	int8_t battery = 0,
 	       first_largest = 1,
 	       second_largest = 1,
@@ -72,7 +76,7 @@ int main(int argc, char *argv[]) {
 	if ((mostpowerfulofbank = malloc(banks)) == NULL)
 		return -1;
 
-	for (int i = 0; i < banks; i++) {
+	for (i = 0; i < banks; i++) {
 		printf("Bank %d: ", i);
 		for (banklen = 0; ; banklen++) {
 			battery = totalbanks[i][banklen];
@@ -86,12 +90,12 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		}
-		for (int j = 0; j < (banklen - 1); j++) {
+		for (j = 0; j < (banklen - 1); j++) {
 			battery = totalbanks[i][j];
 			if (first_largest < battery) {
 				first_largest = battery;
 				first_largest_pos = j;
-				for (int k = (first_largest_pos + 1); k < banklen; k++) {
+				for (k = (first_largest_pos + 1); k < banklen; k++) {
 					battery = totalbanks[i][k];
 					if (second_largest < battery || second_largest_pos <= first_largest_pos) {
 						second_largest = battery;
@@ -100,8 +104,6 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
-		printf("First largest: %d\nSecond largest: %d\n",
-				first_largest, second_largest);
 		mostpowerfulofbank[i] = ((first_largest * 10) + second_largest);
 		printf("Largest batteries of the bank: %d\n",
 				mostpowerfulofbank[i]);
@@ -110,6 +112,8 @@ int main(int argc, char *argv[]) {
 		first_largest_pos = 0;
 		second_largest_pos = 0;
 	}
+	for (i = 0; i < banks; i++) sum += mostpowerfulofbank[i];
+	printf("Sum of the total joltage: %d\n", sum);
 
 	free(totalbanks);
 	free(mostpowerfulofbank);
