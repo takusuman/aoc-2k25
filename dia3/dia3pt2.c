@@ -106,7 +106,6 @@ int main(int argc, char *argv[]) {
 		 * 	largest_pos=0
 		 * done
 		 */
-		printf("%d\n", banklen);
 		pos = 0;
 		for (k = 0; k < 12; k++) {
 			/* Get the largest battery from the bank. */ 
@@ -122,6 +121,12 @@ int main(int argc, char *argv[]) {
 			largest = 0;
 			largest_pos = 0;
 		}
+
+		/*
+		 * Now "convert" the batteries[] array
+		 * into a single (and really large)
+		 * integer.
+		 */
 		m = 1;
 		for (k = 0; k < 12; k++) {
 			mostpowerfulofbank[i] += (batteries[((12 - 1) - k)] * m);
@@ -130,8 +135,9 @@ int main(int argc, char *argv[]) {
 		}
 		printf("Largest batteries of the bank: %ld\n",
 				mostpowerfulofbank[i]);
+		sum += mostpowerfulofbank[i];
 	}
-	for (i = 0; i < banks; i++) sum += mostpowerfulofbank[i];
+
 	printf("Sum of the total joltage: %ld\n", sum);
 
 	free(totalbanks);
