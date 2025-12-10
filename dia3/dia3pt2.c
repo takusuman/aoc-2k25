@@ -32,11 +32,12 @@ int main(int argc, char *argv[]) {
 		     bufsiz = 5,
 		     largest_pos = 0,
 		     pos = 0,
-		     sum = 0,
 		     i = 0,
 		     j = 0,
-		     k = 0,
-		     *mostpowerfulofbank = NULL;
+		     k = 0;
+        unsigned long int m = 0,
+		      sum = 0,
+		      *mostpowerfulofbank = NULL;
 	int8_t battery = 0,
 	       largest = 0,
 	       batteries[12],
@@ -66,7 +67,7 @@ int main(int argc, char *argv[]) {
 		totalbanks[banks] = bankbuf;
 	}
 
-	if ((mostpowerfulofbank = malloc(banks)) == NULL)
+	if ((mostpowerfulofbank = malloc(banks * sizeof(unsigned long int))) == NULL)
 		return -1;
 
 	for (i = 0; i < banks; i++) {
@@ -121,13 +122,17 @@ int main(int argc, char *argv[]) {
 			largest = 0;
 			largest_pos = 0;
 		}
-		for (k = 11; ; k--)
-			mostpowerfulofbank[i] += pow(batteries[k], (k + 1));
-		printf("Largest batteries of the bank: %d\n",
+		m = 1;
+		for (k = 0; k < 12; k++) {
+			mostpowerfulofbank[i] += (batteries[((12 - 1) - k)] * m);
+			/* Shift a digit to left. */
+			m *= 10;
+		}
+		printf("Largest batteries of the bank: %ld\n",
 				mostpowerfulofbank[i]);
 	}
 	for (i = 0; i < banks; i++) sum += mostpowerfulofbank[i];
-	printf("Sum of the total joltage: %d\n", sum);
+	printf("Sum of the total joltage: %ld\n", sum);
 
 	free(totalbanks);
 	free(mostpowerfulofbank);
