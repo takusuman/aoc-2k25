@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 		 */
 		pos = 0;
 		for (k = 0; k < 12; k++) {
-			/* Get the largest battery from the bank. */ 
+			/* Get the largest battery from the bank. */
 			for (j = pos; j < (banklen - ((12 - k) - 1)); j++) {
 				battery = totalbanks[i][j];
 				if (battery > largest) {
