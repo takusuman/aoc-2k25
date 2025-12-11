@@ -27,11 +27,14 @@ Arquivo "Z:\dia4\example.txt"
 Var
    // Seção de Declarações das variáveis.
    soma: real
-   caractereatual: caractere
+   rolosaoredor: inteiro
    tamanholinha: inteiro
    nlinha: inteiro
-   m, n: inteiro
+   m, n, mcoord, ncoord: inteiro
+   caractereatual: caractere
+   caracteredetroca: caractere
    linhas: vetor[1..140] de caractere
+   novaslinhas: vetor[1..140] de caractere
 
    // Funções também entram cá.
    Função SubstituirEm(cadeia : caractere; posicao: inteiro; porcaractere: caractere) : caractere
@@ -47,7 +50,7 @@ Var
                   se (posicaoatual = posicao) então
                      novacadeia <- novacadeia + porcaractere
                   senão
-                  novacadeia <- novacadeia + copia(cadeia, posicaoatual, 1)
+                     novacadeia <- novacadeia + copia(cadeia, posicaoatual, 1)
                   fimse
              fimpara
 
@@ -81,13 +84,49 @@ Inicio
 
    para m de 1 até nlinha faça
         para n de 1 até compr(linhas[m]) faça
-        // Se nossos cálculos estiverem corretos:
-        // linhas[m] <- SubstituirEm(linhas[m], n, "x")
+             caractereatual <- copia(linhas[m], n, 1)
+             escolha caractereatual
+             caso "@"
+                  rolosaoredor <- 0
+                  para mcoord de -1 até 1 faça
+                       para ncoord de -1 até 1 faça
+                            escolha Verdadeiro
+                            caso ((mcoord = 0) e (ncoord = 0))
+                                 // Elemento atual na matriz; não faça nada.
+                            caso ((((m + mcoord) > nlinha) ou ((n + ncoord) > compr(linhas[m]))) ou (((m + mcoord) < 1) ou ((n + ncoord) < 1)))
+                                 // As novas posições excedam, em alguma medida,
+                                 // os limites que temos para m e n.
+                            outrocaso
+                                 // Como de praxe.
+                                 caracteredetroca <- copia(linhas[(m + mcoord)], (n + ncoord), 1)
+                                 se (caracteredetroca = "@") então
+                                    rolosaoredor <- rolosaoredor + 1
+                                 fimse
+                                 escreval("(", m, n, ")")
+                                 escreval("mcoord: ", mcoord)
+                                 escreval("ncoord: ", ncoord)
+                                 escreval(rolosaoredor)
+                            fimescolha
+                       fimpara
+                  fimpara
+                  se (rolosaoredor < 4) então
+                     // Se nossos cálculos estiverem corretos...
+                     soma <- soma + 1
+                     // A ideia é que isso funcione como uma "prova real
+                     // visual", digamos assim.
+                     novaslinhas[m] <- SubstituirEm(linhas[m], n, "x")
+                  senão
+                     novaslinhas[m] <- linhas[m]
+                  fimse
+             outrocaso
+                  // '.'
+             fimescolha
+
         fimpara
    fimpara
-   
+
    para m de 1 até nlinha faça
-        escreval(linhas[m])
+        escreval(novaslinhas[m])
    fimpara
-   escreval("Soma de rolos que podem ser removidos: " + soma)
+   escreval("Soma de rolos que podem ser removidos: ", soma)
 Fimalgoritmo
