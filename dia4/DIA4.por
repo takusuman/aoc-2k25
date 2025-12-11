@@ -6,7 +6,7 @@ Algoritmo "dia4"
 //               Enfim, temos de salvar o Natal.
 // Autor(a)    : Luiz Antônio Rangel
 // Data atual  : 10/12/2025
-// Enunciado da questão:
+// Enunciado da questão no inglês do Rei:
 // "You ride the escalator down to the printing
 // department. They're clearly getting ready
 // for Christmas; they have lots of large rolls
@@ -53,7 +53,6 @@ Var
                      novacadeia <- novacadeia + copia(cadeia, posicaoatual, 1)
                   fimse
              fimpara
-
              retorne novacadeia
    Fimfunção
 
@@ -83,6 +82,8 @@ Inicio
    fimpara
 
    para m de 1 até nlinha faça
+        // Copiar para a nossa "prova real visual".
+        novaslinhas[m] <- linhas[m]
         para n de 1 até compr(linhas[m]) faça
              caractereatual <- copia(linhas[m], n, 1)
              escolha caractereatual
@@ -114,14 +115,11 @@ Inicio
                      soma <- soma + 1
                      // A ideia é que isso funcione como uma "prova real
                      // visual", digamos assim.
-                     novaslinhas[m] <- SubstituirEm(linhas[m], n, "x")
-                  senão
-                     novaslinhas[m] <- linhas[m]
+                     novaslinhas[m] <- SubstituirEm(novaslinhas[m], n, "x")
                   fimse
              outrocaso
                   // '.'
              fimescolha
-
         fimpara
    fimpara
 
