@@ -28,7 +28,6 @@ Var
    // Seção de Declarações das variáveis.
    soma: real
    caractereatual: caractere
-   posicaolinha: inteiro
    tamanholinha: inteiro
    nlinha: inteiro
    m, n: inteiro
@@ -52,7 +51,7 @@ Var
                   fimse
              fimpara
 
-             escreval(novacadeia)
+             retorne novacadeia
    Fimfunção
 
 Inicio
@@ -70,7 +69,8 @@ Inicio
 
         escolha Verdadeiro
         caso (linhas[nlinha] = "")
-             interrompa()
+             interrompa() // Isso aqui ainda precisa de
+                          // um Enter por algum motivo.
         caso (não(compr(linhas[nlinha]) = tamanholinha))
              escreval("Matriz inválida pois os tamanhos de linha divergem.")
              Fimalgoritmo // Li em algum canto que isso daria um erro...
@@ -78,19 +78,16 @@ Inicio
         fimescolha
         tamanholinha <- compr(linhas[nlinha])
    fimpara
-//   caractereatual <- copia(linhas[-1], 1, 1)
-   escreval(caractereatual)
-   caractereatual <- SubstituirEm(linhas[1], 3, "x")
- //  nlinha := 1
- //  enquanto linhas[nlinha] <> "" faça
- //           nlinha <- (nlinha + 1)
- //           linhaatual <- linhas[nlinha]
- //  fimenquanto
-   
-   //tamanholinha <- compr(testeum)
-   //para posicaolinha de 1 até compr(testeum) faça
-   //     caractereescolhido <- copia(testeum, posicao, 1)
-        //escreval(caractereescolhido)
-   //fimpara
 
+   para m de 1 até nlinha faça
+        para n de 1 até compr(linhas[m]) faça
+        // Se nossos cálculos estiverem corretos:
+        // linhas[m] <- SubstituirEm(linhas[m], n, "x")
+        fimpara
+   fimpara
+   
+   para m de 1 até nlinha faça
+        escreval(linhas[m])
+   fimpara
+   escreval("Soma de rolos que podem ser removidos: " + soma)
 Fimalgoritmo
