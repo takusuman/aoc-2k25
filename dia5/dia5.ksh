@@ -60,19 +60,14 @@ for ((;;)); do
 	fi
 done < "$input"
 
-typeset -A freshids
-for ((i=0; i < ${#ranges[@]}; i++)); do
-	initialid="${ranges[i][0]}"
-	lastid="${ranges[i][1]}"
-	for ((j=initialid; j <= lastid; j++)); do
-		((freshids["$j"]=1))
-	done
-done
 for ((j=0; j<${#ids[@]}; j++)); do
-	if [[ -n ${freshids[${ids[j]}]} ]]; then
-		echo Fresco
-		unset freshids[${ids[j]}]
-	else
-		echo Estragado
-	fi
+	for ((i=0; i < ${#ranges[@]}; i++)); do
+		initialid="${ranges[i][0]}"
+		lastid="${ranges[i][1]}"
+		if (( ($initialid <= ${ids[j]}) && (${ids[j]} <= $lastid) )); then
+			echo Fresco
+		else
+			echo Estragado
+		fi
+	done
 done
