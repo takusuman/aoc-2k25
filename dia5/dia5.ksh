@@ -53,5 +53,14 @@ for ((;;)); do
 	fi
 done < "$input"
 
+typeset -A freshids
+for ((i=0; i < ${#ranges[@]}; i++)); do
+	initialid="${ranges[i][0]}"
+	lastid="${ranges[i][1]}"
+	for ((j=initialid; j <= lastid; j++)); do
+		freshids["$j"]=0
+	done
+done
+print -C freshids
 print -C ids
 print -C ranges
