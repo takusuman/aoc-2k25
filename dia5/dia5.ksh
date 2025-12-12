@@ -43,7 +43,7 @@ for ((;;)); do
 		fi
 		if $IngredientIDSection; then
 			eval ids[$nids]="$line"
-			nids=$(( $nids + 1 ))
+			((nids+=1 ))
 		else # Range section.
 			# I could've done an algorithm for predicting
 			# overlapping (ex.: (10, 14) and (16, 20) for
@@ -53,7 +53,7 @@ for ((;;)); do
 			# a "hashmapoid", it shouldn't be a big
 			# problem.
 			eval ranges[$nranges]=$(text_range_to_array_range "$line")
-			nranges=$(( $nranges + 1 ))
+			((nranges+=1 ))
 		fi
 	else
 		break
@@ -65,12 +65,13 @@ for ((i=0; i < ${#ranges[@]}; i++)); do
 	initialid="${ranges[i][0]}"
 	lastid="${ranges[i][1]}"
 	for ((j=initialid; j <= lastid; j++)); do
-		freshids["$j"]=true
+		((freshids["$j"]=1))
 	done
 done
 for ((j=0; j<${#ids[@]}; j++)); do
-	if ${freshids[${ids[j]}]:-false}; then
+	if [[ -n ${freshids[${ids[j]}]} ]]; then
 		echo Fresco
+		unset freshids[${ids[j]}]
 	else
 		echo Estragado
 	fi
