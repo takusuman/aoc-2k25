@@ -123,6 +123,11 @@ Inicio
                        fimpara
                        se (rolosaoredor < 4) então
                           somaporpartes <- somaporpartes + 1
+                          // Como agora temos de trabalhar com toda a matriz a
+                          // fim de descobrir quantos rolos podem ser removidos
+                          // no total absoluto, precisamos remover os rolos de
+                          // fato da matriz original, além de adicionar um "x"
+                          // na nossa matriz de "prova real visual".
                           linhas[m] <- SubstituirEm(linhas[m], n, ".")
                           novaslinhas[m] <- SubstituirEm(novaslinhas[m], n, "x")
                        fimse
