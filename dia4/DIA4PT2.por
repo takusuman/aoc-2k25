@@ -36,6 +36,7 @@ Var
    // Seção de Declarações das variáveis.
    soma: real
    somaporpartes: real
+   chegamos: logico
    rolosaoredor: inteiro
    tamanholinha: inteiro
    nlinha: inteiro
@@ -44,6 +45,7 @@ Var
    caracteredetroca: caractere
    linhas: vetor[1..140] de caractere
    novaslinhas: vetor[1..140] de caractere
+
 
    // Funções também entram cá.
    Função SubstituirEm(cadeia : caractere; posicao: inteiro; porcaractere: caractere) : caractere
@@ -64,8 +66,28 @@ Var
              fimpara
              retorne novacadeia
    Fimfunção
+   // Sim, esse epsilon é grosseiro porque, quando
+   // tentei gerar um dentro do VisuAlg, ele
+   // simplesmente parava em 0,5.
+   Função CompararReal(n1, n2 : real) : logico
+          Var
+             comparacao, epsilon : real
+             igual: logico
+          Inicio
+             igual <- Falso
+             epsilon <- 0.01
+             comparacao <- abs(n1 - n2)
+             se (comparacao <= epsilon) então
+                igual <- Verdadeiro
+             fimse
+             retorne igual
+   Fimfunção
 
 Inicio
+   // Descobri que o VisuAlg consegue contar o tempo de execução.
+   // É do balacobaco. :^)
+   cronometro on
+
    // Ler o arquivo de entrada para o vetor de linhas.
    // As linhas por si só serão tratadas como vetores,
    // logo estamos a lidar com uma matriz na prática.
@@ -89,8 +111,9 @@ Inicio
         fimescolha
         tamanholinha <- compr(linhas[nlinha])
    fimpara
-
-   enquanto Verdadeiro faça
+   
+   chegamos <- Falso
+   enquanto não(chegamos) faça
       somaporpartes <- 0
       para m de 1 até nlinha faça
              // Copiar para a nossa "prova real visual".
@@ -136,7 +159,8 @@ Inicio
                   fimescolha
              fimpara
       fimpara
-      se (somaporpartes = 0) então
+      se (CompararReal(somaporpartes, 0)) então
+         chegamos <- Verdadeiro
          interrompa()
       fimse
       soma <- soma + somaporpartes
@@ -146,4 +170,5 @@ Inicio
         escreval(novaslinhas[m])
    fimpara
    escreval("Soma de rolos que podem ser removidos: ", soma)
+   cronometro off
 Fimalgoritmo
