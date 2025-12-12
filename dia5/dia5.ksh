@@ -66,9 +66,15 @@ for ((nranges=0; ; nranges++)); do
 			continue
 		fi
 		if ((  ${ranges[$nranges][0]} <= ${ranges[$((nranges - 1))][1]} )); then
-			((ranges[$((nranges - 1))][1]= ${ranges[$nranges][1]} ))
-			unset ranges[$nranges]
+			((newmax=${ranges[$nranges][1]}))
+			if ((newmax < ${ranges[$((nranges - 1))][1]})); then
+				((newmax=${ranges[$((nranges - 1))][1]}))
+			fi
+			((ranges[$((nranges - 1))][1]=newmax))
+			unset ranges[$nranges] newmax
 			((nranges-=1))
+		else
+			continue
 		fi
 	else
 		break;
