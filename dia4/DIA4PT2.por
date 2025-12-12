@@ -136,10 +136,10 @@ Inicio
                   fimescolha
              fimpara
       fimpara
-      soma <- soma + somaporpartes
       se (somaporpartes = 0) então
          interrompa()
       fimse
+      soma <- soma + somaporpartes
    fimenquanto
 
    para m de 1 até nlinha faça
