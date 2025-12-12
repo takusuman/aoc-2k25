@@ -45,6 +45,13 @@ for ((;;)); do
 			eval ids[$nids]="$line"
 			nids=$(( $nids + 1 ))
 		else # Range section.
+			# I could've done an algorithm for predicting
+			# overlapping (ex.: (10, 14) and (16, 20) for
+			# (12, 18)), but it would take some work that
+			# I'm not willing to do right now and, since
+			# we'll be deduplicating the ranges later at
+			# a "hashmapoid", it shouldn't be a big
+			# problem.
 			eval ranges[$nranges]=$(text_range_to_array_range "$line")
 			nranges=$(( $nranges + 1 ))
 		fi
@@ -58,9 +65,13 @@ for ((i=0; i < ${#ranges[@]}; i++)); do
 	initialid="${ranges[i][0]}"
 	lastid="${ranges[i][1]}"
 	for ((j=initialid; j <= lastid; j++)); do
-		freshids["$j"]=0
+		freshids["$j"]=true
 	done
 done
-print -C freshids
-print -C ids
-print -C ranges
+for ((j=0; j<${#ids[@]}; j++)); do
+	if ${freshids[${ids[j]}]:-false}; then
+		echo Fresco
+	else
+		echo Estragado
+	fi
+done
