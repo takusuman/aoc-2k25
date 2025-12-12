@@ -56,6 +56,8 @@ for ((;;)); do
 	fi
 done < "$input"
 
+# Sort numerically and then parse the
+# ranges to a compound variable.
 (for ((i=0; i < $nranges; i++)); do
 	echo "${cruderanges[$i]}"
 done | sort -n) |
@@ -66,10 +68,13 @@ for ((nranges=0; ; nranges++)); do
 			continue
 		fi
 		if ((  ${ranges[$nranges][0]} <= ${ranges[$((nranges - 1))][1]} )); then
+			# Check for the actual largest
+			# last value on the range.
 			((newmax=${ranges[$nranges][1]}))
 			if ((newmax < ${ranges[$((nranges - 1))][1]})); then
 				((newmax=${ranges[$((nranges - 1))][1]}))
 			fi
+			# Replace the value and walk back past one.
 			((ranges[$((nranges - 1))][1]=newmax))
 			unset ranges[$nranges] newmax
 			((nranges-=1))
