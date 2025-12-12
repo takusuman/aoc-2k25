@@ -22,6 +22,9 @@
 # that ingredient IDs 3, 4, and 5 are all fresh. The
 # ranges can also overlap; an ingredient ID is fresh if
 # it is in any range.
+#
+# taks note: Compile this with shcomp, the mathematical
+# operations will be somewhat faster.
 
 function text_range_to_array_range {
 	typeset -a range[2]
@@ -45,20 +48,35 @@ for ((;;)); do
 			eval ids[$nids]="$line"
 			((nids+=1 ))
 		else # Range section.
-			# I could've done an algorithm for predicting
-			# overlapping (ex.: (10, 14) and (16, 20) for
-			# (12, 18)), but it would take some work that
-			# I'm not willing to do right now and, since
-			# we'll be deduplicating the ranges later at
-			# a "hashmapoid", it shouldn't be a big
-			# problem.
-			eval ranges[$nranges]=$(text_range_to_array_range "$line")
+			cruderanges[$nranges]="$line"
 			((nranges+=1 ))
 		fi
 	else
 		break
 	fi
 done < "$input"
+
+(for ((i=0; i < $nranges; i++)); do
+	echo "${cruderanges[$i]}"
+done | sort -n) |
+for ((nranges=0; ; nranges++)); do
+	if read line; then
+		eval ranges[$nranges]=$(text_range_to_array_range "$line")
+		if (( nranges == 0 )); then
+			continue
+		fi
+		if ((  ${ranges[$nranges][0]} <= ${ranges[$((nranges - 1))][1]} )); then
+			((ranges[$((nranges - 1))][1]= ${ranges[$nranges][1]} ))
+			unset ranges[$nranges]
+			((nranges-=1))
+		fi
+	else
+		break;
+	fi
+done
+unset cruderanges
+
+printf 1>&2 "Faixas de IDs: %#B\n" ranges
 
 for ((j=0; j<${#ids[@]}; j++)); do
 	for ((i=0; i < ${#ranges[@]}; i++)); do
