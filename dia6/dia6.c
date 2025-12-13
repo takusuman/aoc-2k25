@@ -49,8 +49,8 @@ extern char *strdup(const char*);
 char **gethomeworkline(FILE *f);
 
 int main(int argc, char *argv[]) {
-	int total = 0;
-	unsigned long int grandtotal = 0;
+	unsigned long int total = 0,
+		      grandtotal = 0;
 	size_t i = 0,
 	       m = 0,
 	       n = 0,
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 			}
 
 		}
-		printf("= %d\n", total);
+		printf("= %ld\n", total);
 		grandtotal += total;
 	}
 	printf("Grand total: %ld\n", grandtotal);
