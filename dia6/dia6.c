@@ -28,21 +28,34 @@
  * answers to the individual problems."
  */
 
+/* Just for the love of the game. */
+#define cephalopod_to_human_homework(n, op) \
+	fputs(n, stdout); \
+	if (m < (maxm - 2)) { \
+		putchar(' '); \
+		putchar(op); \
+		putchar(' '); \
+	}
+
 #include <string.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+extern char *strdup(const char*);
 char **gethomeworkline(FILE *f);
+
 int main(int argc, char *argv[]) {
+	int total = 0;
+	unsigned long int grandtotal = 0;
 	size_t i = 0,
 	       m = 0,
 	       n = 0,
 	       maxm = 0,
-	       maxn = 0,
-	       prevmaxn = 0;
-	char *input = NULL,
+	       maxn = 0;
+	char op = '\0',
+	     *input = NULL,
 	     **line = NULL,
 		**lines[5];
 	FILE *inputfp = NULL;
@@ -65,10 +78,25 @@ int main(int argc, char *argv[]) {
 	for (maxn = 0; lines[(maxm - 1)][maxn] != NULL; maxn++);
 
 	for (n = 0; n < maxn; n++) {
-		for (m = 0; m < maxm; m++) {
-			printf("line[%d][%d]: %s\n", m, n, lines[m][n]);
+		op = *lines[(maxm - 1)][n];
+		/* total = (op == '*')? 1 : 0; */
+		total = (op == '*');
+		for (m = 0; m < (maxm - 1); m++) {
+			cephalopod_to_human_homework(lines[m][n], op)
+			switch (op) {
+				case '*':
+					total *= atoi(lines[m][n]);
+					break;
+				case '+':
+					total += atoi(lines[m][n]);
+					break;
+			}
+
 		}
+		printf("= %d\n", total);
+		grandtotal += total;
 	}
+	printf("Grand total: %ld\n", grandtotal);
 
 	fclose(inputfp);
 	return 0;
