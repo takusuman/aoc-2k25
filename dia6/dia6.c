@@ -27,13 +27,21 @@
  * the grand total of adding together all of the
  * answers to the individual problems."
  */
+
 #include <string.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+
 char **gethomeworkline(FILE *f);
 int main(int argc, char *argv[]) {
+	size_t i = 0,
+	       m = 0,
+	       n = 0,
+	       maxm = 0,
+	       maxn = 0,
+	       prevmaxn = 0;
 	char *input = NULL,
 	     **line = NULL,
 		**lines[5];
@@ -44,13 +52,23 @@ int main(int argc, char *argv[]) {
 	inputfp = fopen(input, "r");
 	if (!inputfp) return -1;
 
-	for (int i=0; (line = gethomeworkline(inputfp)) != NULL ; i++) {
-		  lines[i] = line;
+	/*
+	 * Add each line as an string array to lines[],
+	 * then calculate the max number of elemens
+	 * (columns) in each line; since it's a matrix,
+	 * all lines shall have the same number of
+	 * columns.
+	 */
+	for (i=0; (line = gethomeworkline(inputfp)) != NULL ; i++, maxm++) {
+		lines[i] = line;
 	}
+	for (maxn = 0; lines[(maxm - 1)][maxn] != NULL; maxn++);
 
-	//for () {
-
-	//}
+	for (n = 0; n < maxn; n++) {
+		for (m = 0; m < maxm; m++) {
+			printf("line[%d][%d]: %s\n", m, n, lines[m][n]);
+		}
+	}
 
 	fclose(inputfp);
 	return 0;
