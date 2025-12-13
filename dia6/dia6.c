@@ -46,26 +46,29 @@ int main(int argc, char *argv[]) {
 
 	for (int i=0; (line = gethomeworkline(inputfp)) != NULL ; i++) {
 		  lines[i] = line;
-		  for (int j = 0; lines[i][j]; j++) puts(lines[i][j]);
 	}
+
+	//for () {
+
+	//}
 
 	fclose(inputfp);
 	return 0;
 }
 
 char **gethomeworkline(FILE *f) {
-	char **linebuf = NULL,
-		**newlinebuf = NULL,
-		*linebufp = NULL;
+	char b = 0,
+	     *linebuf = NULL,
+	     *newlinebuf = NULL,
+	     *elem = NULL,
+	     **homeworkelems,
+	     **newhomeworkelems;
 	size_t l = 0,
-	       c = 0,
-	       nelem = 0,
-		bufsiz = 250,
-		subbufsiz = 3;
-	int b = 0;
-	bool onspace = false;
-	linebuf = malloc((bufsiz * sizeof(char *)));
-
+	       e = 0,
+	       bufsiz = 250,
+	       elemsbufsiz = 4;
+	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
+	linebuf = malloc((bufsiz * sizeof(char)));
 	/*
 	 * Prototype of the parser in KornShell 93:
 	 * nelem=0
@@ -85,36 +88,39 @@ char **gethomeworkline(FILE *f) {
 	 * 	esac
 	 * done
 	 */
-	nelem = 0;
-	linebuf[nelem] = malloc(6);
 	for (l = 0; (b = getc(f)) != EOF; l++) {
-		if ((nelem + 1) > bufsiz) {
+		if ((l + 1) > bufsiz) {
 			bufsiz += 250;
-			if ((newlinebuf = realloc(linebuf, (bufsiz * sizeof(char *)))) == NULL)
+			if ((newlinebuf = realloc(linebuf, (bufsiz * sizeof(char)))) == NULL)
 				return NULL;
 			else
 				linebuf = newlinebuf;
 		}
-
 		switch (b) {
-			case ' ':
-				if (!onspace) {
-					onspace=true;
-					c = 0;
-					nelem++;
-					linebuf[nelem] = malloc(6);
-				}
-				continue;
 			case '\n':
 				break;
 			default:
-				onspace=false;
-				linebuf[nelem][c] = b;
-			        c++;
+				linebuf[l] = b;
 				continue;
 		}
 		break;
 	}
-	linebuf[(nelem+ 1)] = NULL;
-	return linebuf;
+	linebuf[l] = '\0';
+
+	for (e = 0, elem = strtok(linebuf, " "); (elem != NULL);
+		elem = strtok(NULL, " "), e++) {
+		if ((e + 1) > elemsbufsiz) {
+			elemsbufsiz += 4;
+			if ((newhomeworkelems =
+				realloc(homeworkelems,
+					(elemsbufsiz * sizeof(char *)))) == NULL)
+				return NULL;
+			else
+				homeworkelems = newhomeworkelems;
+		}
+
+		homeworkelems[e] = strdup(elem);
+	}
+	free(linebuf);
+	return (l > 0)? homeworkelems : NULL;
 }
