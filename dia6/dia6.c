@@ -27,26 +27,89 @@
  * the grand total of adding together all of the
  * answers to the individual problems."
  */
-
+#include <string.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+char **gethomeworkline(FILE *f);
 int main(int argc, char *argv[]) {
-/*
- * Prototype of the parser in KornShell 93:
- * nelem=0                      
- * onspace=false
- * unset tarray
- * for ((i=0; i<${#t}; i++)); do
- * 	chr="${t:$i:1}"
- * 	case "$chr" in
- * 	' ') if $onspace; then
- * 		continue
- * 	     else
- * 		nelem=$((nelem + 1))
- * 	     fi
- * 	     onspace=true ;;
- * 	*) onspace=false
- * 	     tarray[nelem]+="$chr" ;;
- * 	esac
- * done
- */
+	char **line = NULL;
+	char *input = NULL;
+	FILE *inputfp = NULL;
+
+	if (argc <= 1) return -1;
+	input = argv[1];
+	inputfp = fopen(input, "r");
+	if (!inputfp) return -1;
+
+	for (int i=0; (line = gethomeworkline(inputfp)) != NULL ; i++) {
+		puts("");
+	}
 	return 0;
+}
+
+char **gethomeworkline(FILE *f) {
+	char **linebuf = NULL,
+		**newlinebuf = NULL,
+		*linebufp = NULL;
+	size_t l = 0,
+	       c = 0,
+	       nelem = 0,
+		bufsiz = 250,
+		subbufsiz = 3;
+	int b = 0;
+	bool onspace = false;
+	linebuf = malloc((bufsiz * sizeof(char *)));
+
+	/*
+	 * Prototype of the parser in KornShell 93:
+	 * nelem=0
+	 * onspace=false
+	 * unset tarray
+	 * for ((i=0; i<${#t}; i++)); do
+	 * 	chr="${t:$i:1}"
+	 * 	case "$chr" in
+	 * 	' ') if $onspace; then
+	 * 		continue
+	 * 	     else
+	 * 		nelem=$((nelem + 1))
+	 * 	     fi
+	 * 	     onspace=true ;;
+	 * 	*) onspace=false
+	 * 	     tarray[nelem]+="$chr" ;;
+	 * 	esac
+	 * done
+	 */
+	nelem = 0;
+	linebuf[nelem] = malloc(6);
+	for (l = 0; (b = getc(f)); l++) {
+		if ((nelem + 1) > bufsiz) {
+			bufsiz += 250;
+			if ((newlinebuf = realloc(linebuf, (bufsiz * sizeof(char *)))) == NULL)
+				return NULL;
+			else
+				linebuf = newlinebuf;
+		}
+
+		switch (b) {
+			case ' ':
+				if (!onspace) {
+					onspace=true;
+					c = 0;
+					nelem++;
+					linebuf[nelem] = malloc(6);
+				} else {
+					continue;
+				}
+				break;
+			default:
+				onspace=false;
+				linebuf[nelem][c] = b;
+			        c++;
+				break;
+		}
+	}
+	linebuf[nelem++] = NULL;
+	return linebuf;
 }
