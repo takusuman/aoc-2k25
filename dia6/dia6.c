@@ -34,8 +34,9 @@
 #include <stdio.h>
 char **gethomeworkline(FILE *f);
 int main(int argc, char *argv[]) {
-	char **line = NULL;
-	char *input = NULL;
+	char *input = NULL,
+	     **line = NULL,
+		**lines[5];
 	FILE *inputfp = NULL;
 
 	if (argc <= 1) return -1;
@@ -44,8 +45,11 @@ int main(int argc, char *argv[]) {
 	if (!inputfp) return -1;
 
 	for (int i=0; (line = gethomeworkline(inputfp)) != NULL ; i++) {
-		puts("");
+		  lines[i] = line;
+		  for (int j = 0; lines[i][j]; j++) puts(lines[i][j]);
 	}
+
+	fclose(inputfp);
 	return 0;
 }
 
@@ -83,7 +87,7 @@ char **gethomeworkline(FILE *f) {
 	 */
 	nelem = 0;
 	linebuf[nelem] = malloc(6);
-	for (l = 0; (b = getc(f)); l++) {
+	for (l = 0; (b = getc(f)) != EOF; l++) {
 		if ((nelem + 1) > bufsiz) {
 			bufsiz += 250;
 			if ((newlinebuf = realloc(linebuf, (bufsiz * sizeof(char *)))) == NULL)
@@ -99,17 +103,18 @@ char **gethomeworkline(FILE *f) {
 					c = 0;
 					nelem++;
 					linebuf[nelem] = malloc(6);
-				} else {
-					continue;
 				}
+				continue;
+			case '\n':
 				break;
 			default:
 				onspace=false;
 				linebuf[nelem][c] = b;
 			        c++;
-				break;
+				continue;
 		}
+		break;
 	}
-	linebuf[nelem++] = NULL;
+	linebuf[(nelem+ 1)] = NULL;
 	return linebuf;
 }
