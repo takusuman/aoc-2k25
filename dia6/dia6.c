@@ -26,6 +26,8 @@
  * To check their work, cephalopod students are given
  * the grand total of adding together all of the
  * answers to the individual problems."
+ *
+ * compile: gcc -Wall -std=c99 -O3 -o dia6 dia6.c -pipe
  */
 
 /* Just for the love of the game. */
