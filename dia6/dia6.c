@@ -37,11 +37,11 @@
 		putchar(' '); \
 	}
 
-#include <string.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern char *strdup(const char*);
 char **gethomeworkline(FILE *f);
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 		/* total = (op == '*')? 1 : 0; */
 		total = (op == '*');
 		for (m = 0; m < (maxm - 1); m++) {
-			cephalopod_to_human_homework(lines[m][n], op)
+			cephalopod_to_human_homework(lines[m][n], op);
 			switch (op) {
 				case '*':
 					total *= atoi(lines[m][n]);
