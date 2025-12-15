@@ -168,12 +168,12 @@ char **gethomeworkline(FILE *f) {
 	 * 	((lennum[$col]+= 1))
 	 * done
 	 */
-	numlen = malloc((l * sizeof(size_t)));
+	numlen = calloc(l, sizeof(size_t));
 	for (c = 0; linebuf[(l - 1)][c]; c++) {
 		if (linebuf[(l - 1)][c] != ' ') {
-			if (((c + col) > 0) && 
+			col += (c > 0); /* 1 when true. */
+			if ((col > 0) && 
 				linebuf[(l - 1)][(c - 1)] == ' ') {
-				col += 1;
 				numlen[(col - 1)] -= 1;
 			}
 		}
