@@ -125,16 +125,25 @@ char **gethomeworkline(FILE *f) {
 	       l = 0,
 	       linebufsiz = 1,
 	       elemsbufsiz = 5;
-	linebuf = malloc(((linebufsiz + 1) * sizeof(char *)));
+	linebuf = malloc(((linebufsiz) * sizeof(char *)));
 
 	for (c = 0; (b = fgetc(f)) != EOF; c++) {
 		if ((c == 0) || (b == '\n')) {
 			if (b == '\n') {
 				l++;
-				c = 0;
+				c = 0; 
 			}
+			linebufsiz += 1;
+			linebuf = realloc(linebuf, (linebufsiz * sizeof(char *)));
 			linebuf[l] = malloc((BUFSIZ * sizeof(char)));
-			if (b == '\n') continue;
+			if (b == '\n') {
+				/*
+				 * So it becomes 0 later. I know 
+				 * this isn't a good practice.
+				 */
+				c--; 
+				continue;
+			}
 		}
 		linebuf[l][c] = b;
 	}
