@@ -123,10 +123,10 @@ char **gethomeworkline(FILE *f) {
 	size_t c = 0,
 	       e = 0,
 	       l = 0,
+	       col = 0,
 	       linebufsiz = 1,
 	       elemsbufsiz = 5,
-	       numlen = 0;
-	bool foundnum = false;
+	       *numlen = NULL;
 	linebuf = malloc(((linebufsiz) * sizeof(char *)));
 
 	for (c = 0; (b = fgetc(f)) != EOF; c++) {
@@ -168,6 +168,10 @@ char **gethomeworkline(FILE *f) {
 	 * 	((lennum[$col]+= 1))
 	 * done
 	 */
+	numlen = malloc((l * sizeof(size_t)));
+	for (c = 0; c < strlen(linebuf[(l - 1)]); c++) {
+		putchar(linebuf[(l - 1)][c]);
+	}
 
 	for (e = 0; e < l; e++) puts(linebuf[e]);
 //	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
