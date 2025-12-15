@@ -151,37 +151,22 @@ char **gethomeworkline(FILE *f) {
 	}
 
 	/*
-	 * Now the hellesque part: count everything until
-	 * a number appears and, after it does, stop at
-	 * the first space.
-	 * We will do this for every line, and the next space
-	 * after the number will determine that a column is
-	 * over.
-	 * This is meant to get the largest number in length
-	 * for every column only.
-	 *
+	 * Count how many spaces does a number occupy.
 	 * A small prototype in Korn Shell 93:
 	 *
-	 * foundnum=false
-	 * col=0
-	 * lennum=(0 0 0)
-	 * for ((l=0; l < ${#t[@]}; l++)); do
-	 * 	for ((c=0; c<${#t[$l]}; c++)); do
-	 * 		if [[ "${t[$l]:$c:1}" == [0-9] ]]; then
-	 * 			foundnum=true
-	 *	 		((lennum[$col]+= 1))
+	 * # t[3] is the last line containing the operators.
+	 * col=-1
+	 * lennum=(0 0 0 0)
+	 * for ((i=0; i<${#t[3]}; i++)); do
+	 * 	if [[ "${t[3]:$i:1}" != ' ' ]]; then
+	 * 		((col+=1))
+	 * 		if (( $col > 0 )) &&
+	 * 			[[ "${t[3]:$(($i - 1)):1}" == ' ' ]]; then
+	 * 			((lennum[$(($col - 1))]-= 1))
 	 * 		fi
-	 * 		if $foundnum && [[ ${t[$l]:$c:1} == ' ' ]] &&
-	 * 			[[ ${t[$l]:$(($c + 1)):1} == [0-9] ]]; then
-	 * 			((lennum[$col]-= 1))
-	 * 			((col+= 1))
-	 * 			foundnum=false
-	 * 			continue
-	 * 		fi
-	 * 	done
-	 * 	col=0
-	 * 	foundnum=false
-	 * 	done
+	 * 	fi
+	 * 	((lennum[$col]+= 1))
+	 * done
 	 */
 
 	for (e = 0; e < l; e++) puts(linebuf[e]);
