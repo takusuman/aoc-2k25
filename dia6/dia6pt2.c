@@ -124,29 +124,64 @@ char **gethomeworkline(FILE *f) {
 	       e = 0,
 	       l = 0,
 	       linebufsiz = 1,
-	       elemsbufsiz = 5;
+	       elemsbufsiz = 5,
+	       numlen = 0;
+	bool foundnum = false;
 	linebuf = malloc(((linebufsiz) * sizeof(char *)));
 
 	for (c = 0; (b = fgetc(f)) != EOF; c++) {
 		if ((c == 0) || (b == '\n')) {
 			if (b == '\n') {
 				l++;
-				c = 0; 
+				c = 0;
 			}
 			linebufsiz += 1;
 			linebuf = realloc(linebuf, (linebufsiz * sizeof(char *)));
 			linebuf[l] = malloc((BUFSIZ * sizeof(char)));
 			if (b == '\n') {
 				/*
-				 * So it becomes 0 later. I know 
+				 * So it becomes 0 later. I know
 				 * this isn't a good practice.
 				 */
-				c--; 
+				c--;
 				continue;
 			}
 		}
 		linebuf[l][c] = b;
 	}
+
+	/*
+	 * Now the hellesque part: count everything until
+	 * a number appears and, after it does, stop at
+	 * the first space.
+	 * We will do this for every line, and the next space
+	 * after the number will determine that a column is
+	 * over.
+	 * This is meant to get the largest number in length
+	 * for every column only.
+	 *
+	 * A small prototype in Korn Shell 93:
+	 *
+	 * foundnum=false
+	 * col=0
+	 * lennum=(0 0 0)
+	 * for ((l=0; l < ${#t[@]}; l++)); do
+	 * 	for ((c=0; c<${#t[$l]}; c++)); do
+	 * 		if $foundnum && [[ ${t[$l]:$c:1} == ' ' ]]; then
+	 * 			((col+= 1))
+	 * 			foundnum=false
+	 * 			continue
+	 * 		fi
+	 * 		if [[ "${t[$l]:$c:1}" -ge 0 ]] &&
+	 * 			[[ "${t[$l]:$c:1}" -le 9 ]]; then
+	 * 			foundnum=true
+	 * 		fi
+	 * 		((lennum[$col]+= 1))
+	 * 	done
+	 * 	col=0
+	 * done
+	 */
+
 	for (e = 0; e < l; e++) puts(linebuf[e]);
 //	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
 //	for (e = 0, elem = strtok(linebuf, " "); (elem != NULL);
