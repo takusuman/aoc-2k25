@@ -167,6 +167,10 @@ char **gethomeworkline(FILE *f) {
 	 * lennum=(0 0 0)
 	 * for ((l=0; l < ${#t[@]}; l++)); do
 	 * 	for ((c=0; c<${#t[$l]}; c++)); do
+	 * 		if [[ "${t[$l]:$c:1}" == [0-9] ]]; then
+	 * 			foundnum=true
+	 *	 		((lennum[$col]+= 1))
+	 * 		fi
 	 * 		if $foundnum && [[ ${t[$l]:$c:1} == ' ' ]] &&
 	 * 			[[ ${t[$l]:$(($c + 1)):1} == [0-9] ]]; then
 	 * 			((lennum[$col]-= 1))
@@ -174,12 +178,9 @@ char **gethomeworkline(FILE *f) {
 	 * 			foundnum=false
 	 * 			continue
 	 * 		fi
-	 * 		if [[ "${t[$l]:$c:1}" == [0-9] ]]; then
-	 * 			foundnum=true
-	 * 		fi
-	 * 		((lennum[$col]+= 1))
 	 * 	done
 	 * 	col=0
+	 * 	foundnum=false
 	 * 	done
 	 */
 
