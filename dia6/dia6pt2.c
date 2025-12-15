@@ -155,11 +155,13 @@ char **gethomeworkline(FILE *f) {
 	 * A small prototype in Korn Shell 93:
 	 *
 	 * # t[3] is the last line containing the operators.
-	 * col=-1
+	 * col=0
 	 * lennum=(0 0 0 0)
 	 * for ((i=0; i<${#t[3]}; i++)); do
 	 * 	if [[ "${t[3]:$i:1}" != ' ' ]]; then
-	 * 		((col+=1))
+	 * 		if (($i > 0)); then
+	 * 			((col+=1))
+	 * 		fi
 	 * 		if (( $col > 0 )) &&
 	 * 			[[ "${t[3]:$(($i - 1)):1}" == ' ' ]]; then
 	 * 			((lennum[$(($col - 1))]-= 1))
