@@ -118,6 +118,7 @@ char **gethomeworkline(FILE *f) {
 	char *elem = NULL,
 	     **linebuf = NULL,
 	     **newlinebuf = NULL,
+	     **linebuf = NULL,
 	     **homeworkelems,
 	     **newhomeworkelems;
 	size_t c = 0,
@@ -172,31 +173,40 @@ char **gethomeworkline(FILE *f) {
 	for (c = 0; linebuf[(l - 1)][c]; c++) {
 		if (linebuf[(l - 1)][c] != ' ') {
 			col += (c > 0); /* 1 when true. */
-			if ((col > 0) && 
+			if ((col > 0) &&
 				linebuf[(l - 1)][(c - 1)] == ' ') {
 				numlen[(col - 1)] -= 1;
 			}
 		}
 		numlen[col] += 1;
 	}
-	
+
 	for (e = 0; e < col; e++) printf("%d\n", numlen[e]);
 	for (e = 0; e < l; e++) puts(linebuf[e]);
-//	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
-//	for (e = 0, elem = strtok(linebuf, " "); (elem != NULL);
-//		elem = strtok(NULL, " "), e++) {
-//		if ((e + 1) > elemsbufsiz) {
-//			elemsbufsiz += 4;
-//			if ((newhomeworkelems =
-//				realloc(homeworkelems,
-//					(elemsbufsiz * sizeof(char *)))) == NULL)
-//				return NULL;
-//			else
-//				homeworkelems = newhomeworkelems;
-//		}
-//
-//		homeworkelems[e] = strdup(elem);
-//	}
+
+	homeworkelems = malloc((l * sizeof(char **)));
+	for (e = 0; e < l; e++) {
+		homeworkelems[e] = malloc((col * sizeof(char *)));
+	}
+
+	/*
+	 * This... Well, this walks through each column, then goes
+	 * for each line and return the numbers/characters in that
+	 * column.
+	 * This is a prototype in, again, Korn Shell 93:
+	 *
+	 * curcol=0
+	 * for ((col=0; col < ${#collen[@]}; col++)); do
+	 * 	acollen="${collen[$col]}"
+	 * 	for ((c=$curcol; c<$((($acollen + $curcol))); c++)); do
+	 * 		for ((m=0; m<${#t[@]}; m++)); do
+	 * 			printf '%s\n' "${t[m]:$c:1}"
+	 * 		done
+	 * 	done
+	 * 	((curcol+=($acollen + 1)))
+	 * done
+	 */
+
 	free(linebuf);
 	return (l > 0)? homeworkelems : NULL;
 }
