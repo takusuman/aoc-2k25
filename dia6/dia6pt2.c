@@ -169,10 +169,18 @@ char **gethomeworkline(FILE *f) {
 	 * done
 	 */
 	numlen = malloc((l * sizeof(size_t)));
-	for (c = 0; c < strlen(linebuf[(l - 1)]); c++) {
-		putchar(linebuf[(l - 1)][c]);
+	for (c = 0; linebuf[(l - 1)][c]; c++) {
+		if (linebuf[(l - 1)][c] != ' ') {
+			if (((c + col) > 0) && 
+				linebuf[(l - 1)][(c - 1)] == ' ') {
+				col += 1;
+				numlen[(col - 1)] -= 1;
+			}
+		}
+		numlen[col] += 1;
 	}
-
+	
+	for (e = 0; e < l; e++) printf("%d\n", numlen[e]);
 	for (e = 0; e < l; e++) puts(linebuf[e]);
 //	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
 //	for (e = 0, elem = strtok(linebuf, " "); (elem != NULL);
