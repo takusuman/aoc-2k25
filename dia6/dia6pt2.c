@@ -126,12 +126,19 @@ char **gethomeworkline(FILE *f) {
 	       linebufsiz = 1,
 	       elemsbufsiz = 5;
 	linebuf = malloc(((linebufsiz + 1) * sizeof(char *)));
-	linebuf[0] = malloc((BUFSIZ * sizeof(char)));
 
 	for (c = 0; (b = fgetc(f)) != EOF; c++) {
-		linebuf[0][c] = b;
+		if ((c == 0) || (b == '\n')) {
+			if (b == '\n') {
+				l++;
+				c = 0;
+			}
+			linebuf[l] = malloc((BUFSIZ * sizeof(char)));
+			if (b == '\n') continue;
+		}
+		linebuf[l][c] = b;
 	}
-	puts(linebuf[0]);
+	for (e = 0; e < l; e++) puts(linebuf[e]);
 //	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
 //	for (e = 0, elem = strtok(linebuf, " "); (elem != NULL);
 //		elem = strtok(NULL, " "), e++) {
