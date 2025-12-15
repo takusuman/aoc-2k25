@@ -86,46 +86,27 @@ int main(int argc, char *argv[]) {
 	inputfp = fopen(input, "r");
 	if (!inputfp) return -1;
 
+	gethomeworkline(inputfp);
 	/* Allocate size dynamically for crudelines[]. */
-	crudelines = malloc(linebufsiz * sizeof(char **));
-	for (i=0; (line = gethomeworkline(inputfp)) != NULL ; i++, maxm++) {
-		if ((i + 1) > linebufsiz) {
-			linebufsiz+=1;
-			crudelines = realloc(crudelines, (linebufsiz * sizeof(char **)));
-		}
-		crudelines[i] = line;
-	}
-	for (maxn = 0; crudelines[(maxm - 1)][maxn] != NULL; maxn++);
-
-	/* For this "cephalopod math" to work, we will basically */
-	for (m=0; m < (maxm - 1); m++) {
-		for (n=0; n < maxn; n++) {
-			puts(crudelines[m][n]);
-		}
-	}
-
-	//for (i=0; crudelines[i]; i++) free(crudelines[i]);
-
-
-	for (n = 0; n < maxn; n++) {
-		op = *crudelines[(maxm - 1)][n];
-		/* total = (op == '*')? 1 : 0; */
-		total = (op == '*');
-		for (m = 0; m < (maxm - 1); m++) {
-			cephalopod_to_human_homework(crudelines[m][n], op);
-			switch (op) {
-				case '*':
-					total *= atoi(crudelines[m][n]);
-					break;
-				case '+':
-					total += atoi(crudelines[m][n]);
-					break;
-			}
-
-		}
-		printf("= %ld\n", total);
-		grandtotal += total;
-	}
+//	for (n = 0; n < maxn; n++) {
+//		op = *crudelines[(maxm - 1)][n];
+//		/* total = (op == '*')? 1 : 0; */
+//		total = (op == '*');
+//		for (m = 0; m < (maxm - 1); m++) {
+//			cephalopod_to_human_homework(crudelines[m][n], op);
+//			switch (op) {
+//				case '*':
+//					total *= atoi(crudelines[m][n]);
+//					break;
+//				case '+':
+//					total += atoi(crudelines[m][n]);
+//					break;
+//			}
+//
+//		}
+//		printf("= %ld\n", total);
+//		grandtotal += total;
+//	}
 	printf("Grand total: %ld\n", grandtotal);
 
 	fclose(inputfp);
@@ -134,69 +115,38 @@ int main(int argc, char *argv[]) {
 
 char **gethomeworkline(FILE *f) {
 	int b = 0;
-	char *linebuf = NULL,
-	     *newlinebuf = NULL,
-	     *elem = NULL,
+	char *elem = NULL,
+	     **linebuf = NULL,
+	     **newlinebuf = NULL,
 	     **homeworkelems,
 	     **newhomeworkelems;
-	size_t l = 0,
+	size_t c = 0,
 	       e = 0,
-	       bufsiz = 250,
-	       elemsbufsiz = 4;
-	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
-	linebuf = malloc((bufsiz * sizeof(char)));
-	/*
-	 * Prototype of the parser in KornShell 93:
-	 * nelem=0
-	 * onspace=false
-	 * unset tarray
-	 * for ((i=0; i<${#t}; i++)); do
-	 * 	chr="${t:$i:1}"
-	 * 	case "$chr" in
-	 * 	' ') if $onspace; then
-	 * 		continue
-	 * 	     else
-	 * 		nelem=$((nelem + 1))
-	 * 	     fi
-	 * 	     onspace=true ;;
-	 * 	*) onspace=false
-	 * 	     tarray[nelem]+="$chr" ;;
-	 * 	esac
-	 * done
-	 */
-	for (l = 0; (b = getc(f)) != EOF; l++) {
-		if ((l + 1) > bufsiz) {
-			bufsiz += 250;
-			if ((newlinebuf = realloc(linebuf, (bufsiz * sizeof(char)))) == NULL)
-				return NULL;
-			else
-				linebuf = newlinebuf;
-		}
-		switch (b) {
-			case '\n':
-				break;
-			default:
-				linebuf[l] = b;
-				continue;
-		}
-		break;
-	}
-	linebuf[l] = '\0';
+	       l = 0,
+	       linebufsiz = 1,
+	       elemsbufsiz = 5;
+	linebuf = malloc(((linebufsiz + 1) * sizeof(char *)));
+	linebuf[0] = malloc((BUFSIZ * sizeof(char)));
 
-	for (e = 0, elem = strtok(linebuf, " "); (elem != NULL);
-		elem = strtok(NULL, " "), e++) {
-		if ((e + 1) > elemsbufsiz) {
-			elemsbufsiz += 4;
-			if ((newhomeworkelems =
-				realloc(homeworkelems,
-					(elemsbufsiz * sizeof(char *)))) == NULL)
-				return NULL;
-			else
-				homeworkelems = newhomeworkelems;
-		}
-
-		homeworkelems[e] = strdup(elem);
+	for (c = 0; (b = fgetc(f)) != EOF; c++) {
+		linebuf[0][c] = b;
 	}
+	puts(linebuf[0]);
+//	homeworkelems = malloc((elemsbufsiz * sizeof(char *)));
+//	for (e = 0, elem = strtok(linebuf, " "); (elem != NULL);
+//		elem = strtok(NULL, " "), e++) {
+//		if ((e + 1) > elemsbufsiz) {
+//			elemsbufsiz += 4;
+//			if ((newhomeworkelems =
+//				realloc(homeworkelems,
+//					(elemsbufsiz * sizeof(char *)))) == NULL)
+//				return NULL;
+//			else
+//				homeworkelems = newhomeworkelems;
+//		}
+//
+//		homeworkelems[e] = strdup(elem);
+//	}
 	free(linebuf);
 	return (l > 0)? homeworkelems : NULL;
 }
