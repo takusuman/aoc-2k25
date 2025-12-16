@@ -69,20 +69,20 @@ char **gethomeworkline(FILE *f);
 int main(int argc, char *argv[]) {
 	unsigned long int total = 0,
 		      grandtotal = 0;
-	size_t linebufsiz = 1,
-	       i = 0,
-	       m = 0,
-	       n = 0,
-	       maxm = 0,
-	       maxn = 0;
-	char op = '\0',
-	     *input = NULL,
-	     **line = NULL,
-		***crudelines;
+//	size_t linebufsiz = 1,
+//	       i = 0,
+//	       m = 0,
+//	       n = 0,
+//	       maxm = 0,
+//	       maxn = 0;
+//	char op = '\0',
+//	     *input = NULL,
+//	     **line = NULL,
+//		***crudelines;
 	FILE *inputfp = NULL;
 
 	if (argc <= 1) return -1;
-	input = argv[1];
+	char *input = argv[1];
 	inputfp = fopen(input, "r");
 	if (!inputfp) return -1;
 
@@ -117,7 +117,6 @@ char **gethomeworkline(FILE *f) {
 	int b = 0;
 	char *elem = NULL,
 	     **linebuf = NULL,
-	     **newlinebuf = NULL,
 	     ***homeworkelems = NULL;
 	size_t c = 0,
 	       e = 0,
@@ -128,7 +127,6 @@ char **gethomeworkline(FILE *f) {
 	       curc = 0,
 	       lines = 0,
 	       linebufsiz = 1,
-	       elemsbufsiz = 5,
 	       *numlen = NULL;
 	linebuf = malloc(((linebufsiz) * sizeof(char *)));
 
@@ -139,8 +137,9 @@ char **gethomeworkline(FILE *f) {
 				c = 0;
 			}
 			linebufsiz += 1;
-			linebuf = realloc(linebuf, (linebufsiz * sizeof(char *)));
-			linebuf[l] = malloc((BUFSIZ * sizeof(char)));
+			if (((linebuf = realloc(linebuf, (linebufsiz * sizeof(char *)))) == NULL) ||
+					((linebuf[l] = malloc((BUFSIZ * sizeof(char)))) == NULL))
+				return NULL;
 			if (b == '\n') {
 				/*
 				 * So it becomes 0 later. I know
@@ -185,9 +184,6 @@ char **gethomeworkline(FILE *f) {
 	/* Since we're counting from 0. */
 	cols += 1;
 
-	for (e = 0; e < cols; e++) printf("%d\n", numlen[e]);
-	for (e = 0; e < lines; e++) puts(linebuf[e]);
-
 	homeworkelems = malloc((lines * sizeof(char **)));
 	for (e = 0; e < lines; e++)
 		homeworkelems[e] = malloc(cols * sizeof(char *));
@@ -212,20 +208,36 @@ char **gethomeworkline(FILE *f) {
 	 * ((nclen+= ${collen[$col]} + 1))
 	 * done
 	 */
-	curc = 0;
 	l = 0;
 	for (col = 0; col < cols; col++) {
 		for (c = curc; c < (numlen[col] + curc); c++) {
-			printf("l: %d\n", l);
 			for (lns=0; lns < (lines - 1); lns++)
 				elem[lns] = linebuf[lns][c];
 			elem[(lns + 1)] = '\0';
-			homeworkelems[l][col] = elem;
+			puts(elem);
+			homeworkelems[l][col] = strdup(elem);
 			l += 1;
 		}
 		l = 0;
 		curc += numlen[col];
 		curc += 1;
+	}
+	curc = 0;
+	for (col = 0; col < cols; col++) {
+		memset(elem, '\0', sizeof(elem));
+		for (e = 0, c = curc; c < (numlen[col] + curc); c++, e++) {
+			elem[e] = linebuf[(lines - 1)][c];
+		}
+		homeworkelems[(lines - 1)][col] = strdup(elem);
+		curc += numlen[col];
+		curc += 1;
+	}
+
+	for (l = 0; l < lines; l++) {
+		for (col = 0; col < cols; col++) {
+			printf("%s ", homeworkelems[l][col]);
+		}
+		putchar('\n');
 	}
 	free(linebuf);
 //	return (l > 0)? homeworkelems : NULL;
