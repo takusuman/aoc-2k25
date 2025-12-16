@@ -48,14 +48,14 @@
  * compile: cc -Wall -std=c99 -O3 -o dia6 dia6pt2.c -pipe
  */
 #define cephalopod_to_human_homework(n, op) ((void)0)
-/* Just for the love of the game. */
-//#define cephalopod_to_human_homework(n, op) \
-//	printf("%d", n); \
-//	if (m < (maxm - 2)) { \
-//		putchar(' '); \
-//		putchar(op); \
-//		putchar(' '); \
-//	}
+	/* Just for the love of the game. */
+	//#define cephalopod_to_human_homework(n, op) \
+	//	printf("%d", n); \
+	//	if (m < (maxm - 2)) { \
+	//		putchar(' '); \
+	//		putchar(op); \
+	//		putchar(' '); \
+	//	}
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -118,11 +118,11 @@ char **gethomeworkline(FILE *f) {
 	char *elem = NULL,
 	     **linebuf = NULL,
 	     **newlinebuf = NULL,
-	     ***homeworkelems,
-	     **newhomeworkelems;
+	     ***homeworkelems = NULL;
 	size_t c = 0,
 	       e = 0,
 	       l = 0,
+	       lns = 0,
 	       col = 0,
 	       cols = 0,
 	       curc = 0,
@@ -188,10 +188,10 @@ char **gethomeworkline(FILE *f) {
 	for (e = 0; e < cols; e++) printf("%d\n", numlen[e]);
 	for (e = 0; e < lines; e++) puts(linebuf[e]);
 
-//	homeworkelems = malloc((lines * sizeof(char **)));
-//	for (e = 0; e < lines; e++) {
-//		homeworkelems[e] = malloc((cols * sizeof(char *)));
-//	}
+	homeworkelems = malloc((lines * sizeof(char **)));
+	for (e = 0; e < lines; e++)
+		homeworkelems[e] = malloc(cols * sizeof(char *));
+	elem = malloc((BUFSIZ * sizeof(char)));
 
 	/*
 	 * This... Well, this walks through each column, then goes
@@ -212,7 +212,21 @@ char **gethomeworkline(FILE *f) {
 	 * ((nclen+= ${collen[$col]} + 1))
 	 * done
 	 */
-
+	curc = 0;
+	l = 0;
+	for (col = 0; col < cols; col++) {
+		for (c = curc; c < (numlen[col] + curc); c++) {
+			printf("l: %d\n", l);
+			for (lns=0; lns < (lines - 1); lns++)
+				elem[lns] = linebuf[lns][c];
+			elem[(lns + 1)] = '\0';
+			homeworkelems[l][col] = elem;
+			l += 1;
+		}
+		l = 0;
+		curc += numlen[col];
+		curc += 1;
+	}
 	free(linebuf);
 //	return (l > 0)? homeworkelems : NULL;
 	return NULL;;
