@@ -118,12 +118,13 @@ char **gethomeworkline(FILE *f) {
 	char *elem = NULL,
 	     **linebuf = NULL,
 	     **newlinebuf = NULL,
-	     **homeworkelems,
+	     ***homeworkelems,
 	     **newhomeworkelems;
 	size_t c = 0,
 	       e = 0,
 	       l = 0,
 	       col = 0,
+	       cols = 0,
 	       curc = 0,
 	       lines = 0,
 	       linebufsiz = 1,
@@ -173,24 +174,24 @@ char **gethomeworkline(FILE *f) {
 	numlen = calloc(BUFSIZ, sizeof(size_t));
 	for (c = 0; linebuf[(lines - 1)][c]; c++) {
 		if (linebuf[(lines - 1)][c] != ' ') {
-			col += (c > 0); /* 1 when true. */
-			if ((col > 0) &&
+			cols += (c > 0); /* 1 when true. */
+			if ((cols > 0) &&
 				linebuf[(lines - 1)][(c - 1)] == ' ') {
-				numlen[(col - 1)] -= 1;
+				numlen[(cols - 1)] -= 1;
 			}
 		}
-		numlen[col] += 1;
+		numlen[cols] += 1;
 	}
 	/* Since we're counting from 0. */
-	col += 1;
+	cols += 1;
 
-	for (e = 0; e < col; e++) printf("%d\n", numlen[e]);
+	for (e = 0; e < cols; e++) printf("%d\n", numlen[e]);
 	for (e = 0; e < lines; e++) puts(linebuf[e]);
 
-	homeworkelems = malloc((lines * sizeof(char **)));
-	for (e = 0; e < lines; e++) {
-		homeworkelems[e] = malloc((col * sizeof(char *)));
-	}
+//	homeworkelems = malloc((lines * sizeof(char **)));
+//	for (e = 0; e < lines; e++) {
+//		homeworkelems[e] = malloc((cols * sizeof(char *)));
+//	}
 
 	/*
 	 * This... Well, this walks through each column, then goes
@@ -198,27 +199,21 @@ char **gethomeworkline(FILE *f) {
 	 * column.
 	 * This is a prototype in, again, Korn Shell 93:
 	 *
-	 * curcol=0
 	 * for ((col=0; col < ${#collen[@]}; col++)); do
-	 * 	for ((c=$curcol; c<$(((${collen[$col]} + $curcol))); c++)); do
-	 * 		for ((m=0; m<${#t[@]}; m++)); do
-	 * 			printf '%s\n' "${t[m]:$c:1}"
-	 * 		done
+	 * for ((clen=$nclen; clen < $((${collen[$col]} + $nclen)); clen++)); do
+	 * 	for ((sline=0; sline < ${#t[@]}; sline++)); do
+	 * 		troca+="${t[$sline]:$clen:1}"
 	 * 	done
-	 * 	((curcol+=(${collen[$col]} + 1)))
+	 * 	nova[$line][$col]="$troca"
+	 * 	unset troca
+	 * 	((line+=1))
+	 * done
+	 * line=0
+	 * ((nclen+= ${collen[$col]} + 1))
 	 * done
 	 */
 
-	curc = 0;
-	for (e = 0; e < col; e++) {
-		for (c = curc; c < (numlen[e] + curc); c++) {
-			for(l = 0; l < (lines - 1); l++) {
-				printf("%c\n", linebuf[l][c]);
-			}
-		}
-		curc += (numlen[e] + 1);
-	}
-
 	free(linebuf);
-	return (l > 0)? homeworkelems : NULL;
+//	return (l > 0)? homeworkelems : NULL;
+	return NULL;;
 }
