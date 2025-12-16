@@ -118,13 +118,14 @@ char **gethomeworkline(FILE *f) {
 	char *elem = NULL,
 	     **linebuf = NULL,
 	     **newlinebuf = NULL,
-	     **linebuf = NULL,
 	     **homeworkelems,
 	     **newhomeworkelems;
 	size_t c = 0,
 	       e = 0,
 	       l = 0,
 	       col = 0,
+	       curc = 0,
+	       lines = 0,
 	       linebufsiz = 1,
 	       elemsbufsiz = 5,
 	       *numlen = NULL;
@@ -150,7 +151,7 @@ char **gethomeworkline(FILE *f) {
 		}
 		linebuf[l][c] = b;
 	}
-
+	lines = l;
 	/*
 	 * Count how many spaces does a number occupy.
 	 * A small prototype in Korn Shell 93:
@@ -170,22 +171,24 @@ char **gethomeworkline(FILE *f) {
 	 * done
 	 */
 	numlen = calloc(BUFSIZ, sizeof(size_t));
-	for (c = 0; linebuf[(l - 1)][c]; c++) {
-		if (linebuf[(l - 1)][c] != ' ') {
+	for (c = 0; linebuf[(lines - 1)][c]; c++) {
+		if (linebuf[(lines - 1)][c] != ' ') {
 			col += (c > 0); /* 1 when true. */
 			if ((col > 0) &&
-				linebuf[(l - 1)][(c - 1)] == ' ') {
+				linebuf[(lines - 1)][(c - 1)] == ' ') {
 				numlen[(col - 1)] -= 1;
 			}
 		}
 		numlen[col] += 1;
 	}
+	/* Since we're counting from 0. */
+	col += 1;
 
 	for (e = 0; e < col; e++) printf("%d\n", numlen[e]);
-	for (e = 0; e < l; e++) puts(linebuf[e]);
+	for (e = 0; e < lines; e++) puts(linebuf[e]);
 
-	homeworkelems = malloc((l * sizeof(char **)));
-	for (e = 0; e < l; e++) {
+	homeworkelems = malloc((lines * sizeof(char **)));
+	for (e = 0; e < lines; e++) {
 		homeworkelems[e] = malloc((col * sizeof(char *)));
 	}
 
@@ -197,15 +200,24 @@ char **gethomeworkline(FILE *f) {
 	 *
 	 * curcol=0
 	 * for ((col=0; col < ${#collen[@]}; col++)); do
-	 * 	acollen="${collen[$col]}"
-	 * 	for ((c=$curcol; c<$((($acollen + $curcol))); c++)); do
+	 * 	for ((c=$curcol; c<$(((${collen[$col]} + $curcol))); c++)); do
 	 * 		for ((m=0; m<${#t[@]}; m++)); do
 	 * 			printf '%s\n' "${t[m]:$c:1}"
 	 * 		done
 	 * 	done
-	 * 	((curcol+=($acollen + 1)))
+	 * 	((curcol+=(${collen[$col]} + 1)))
 	 * done
 	 */
+
+	curc = 0;
+	for (e = 0; e < col; e++) {
+		for (c = curc; c < (numlen[e] + curc); c++) {
+			for(l = 0; l < (lines - 1); l++) {
+				printf("%c\n", linebuf[l][c]);
+			}
+		}
+		curc += (numlen[e] + 1);
+	}
 
 	free(linebuf);
 	return (l > 0)? homeworkelems : NULL;
