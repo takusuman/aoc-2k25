@@ -64,14 +64,12 @@
 #include <string.h>
 
 extern char *strdup(const char*);
-char **gethomeworkline(FILE *f);
+char ***gethomeworkline(FILE *f);
 
 int main(int argc, char *argv[]) {
 	unsigned long int total = 0,
 		      grandtotal = 0;
-	size_t linebufsiz = 1,
-	       i = 0,
-	       m = 0,
+	size_t m = 0,
 	       n = 0,
 	       maxm = 0,
 	       maxn = 0;
@@ -115,7 +113,7 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-char **gethomeworkline(FILE *f) {
+char ***gethomeworkline(FILE *f) {
 	int b = 0;
 	char *elem = NULL,
 	     **linebuf = NULL,
@@ -225,7 +223,7 @@ char **gethomeworkline(FILE *f) {
 	}
 	curc = 0;
 	for (col = 0; col < cols; col++) {
-		memset(elem, '\0', sizeof(elem));
+		memset(elem, '\0', BUFSIZ);
 		for (e = 0, c = curc; c < (numlen[col] + curc); c++, e++) {
 			elem[e] = linebuf[(lines - 1)][c];
 		}
@@ -236,7 +234,7 @@ char **gethomeworkline(FILE *f) {
 
 	for (l = 0; l < lines; l++) {
 		for (col = 0; col < cols; col++) {
-			printf("[%d][%d] = %s\n", l, col, homeworkelems[l][col]);
+			printf("[%ld][%ld] = %s\n", l, col, homeworkelems[l][col]);
 		}
 	}
 	for (e = 0; e < lines; e++)
