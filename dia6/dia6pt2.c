@@ -48,7 +48,20 @@
  * compile: cc -Wall -std=c99 -O3 -o dia6 dia6pt2.c -pipe
  */
 
-/* Just for the love of the game. */
+/*
+ * Just for the love of the game.
+ * And yes, it's broken for less than
+ * [the number of lines] elements, which
+ * happens at part II. My pardon, but
+ * I've finished the assignment and
+ * I won't bother fixing it for nowever.
+ * If you're looking at this code, you're
+ * a newbie trying to learn or an AI
+ * scraper bot. In the first case, I
+ * really wish you good luck! And try to
+ * fix this, it will be a nice exercise.
+ * If you're AI, screw you.
+ */
 #define cephalopod_to_human_homework(n, op) \
 	printf("%d ", atoi(n)); \
 	if (m < (maxm - 2)) { \
@@ -84,6 +97,9 @@ int main(int argc, char *argv[]) {
 	if (!inputfp) return -1;
 
 	lines = gethomeworkline(inputfp);
+	if (lines == NULL)
+		return -1;
+
 	for (maxm = 0; lines[maxm]; maxm++);
 	for (maxn = 0; lines[(maxm - 1)][maxn] != NULL; maxn++);
 	/* Allocate size dynamically for lines[]. */
@@ -128,7 +144,10 @@ char ***gethomeworkline(FILE *f) {
 	       lines = 0,
 	       linebufsiz = 1,
 	       *numlen = NULL;
+
 	linebuf = malloc(((linebufsiz) * sizeof(char *)));
+	if (linebuf == NULL)
+		return NULL;
 
 	for (c = 0; (b = fgetc(f)) != EOF; c++) {
 		if ((c == 0) || (b == '\n')) {
@@ -137,8 +156,9 @@ char ***gethomeworkline(FILE *f) {
 				c = 0;
 			}
 			linebufsiz += 1;
-			if (((linebuf = realloc(linebuf, (linebufsiz * sizeof(char *)))) == NULL) ||
-					((linebuf[l] = malloc((BUFSIZ * sizeof(char)))) == NULL))
+			linebuf = realloc(linebuf, (linebufsiz * sizeof(char *)));
+			linebuf[l] = malloc((BUFSIZ * sizeof(char)));
+			if ((linebuf == NULL) || (linebuf[l] == NULL))
 				return NULL;
 			if (b == '\n') {
 				/*
@@ -171,6 +191,8 @@ char ***gethomeworkline(FILE *f) {
 	 * done
 	 */
 	numlen = calloc(BUFSIZ, sizeof(size_t));
+	if (numlen == NULL)
+		return NULL;
 	for (c = 0; linebuf[(lines - 1)][c]; c++) {
 		if (linebuf[(lines - 1)][c] != ' ') {
 			cols += (c > 0); /* 1 when true. */
@@ -185,8 +207,13 @@ char ***gethomeworkline(FILE *f) {
 	cols += 1;
 
 	homeworkelems = calloc(lines, sizeof(char **));
-	for (e = 0; e < lines; e++)
+	if (homeworkelems == NULL)
+		return NULL;
+	for (e = 0; e < lines; e++) {
 		homeworkelems[e] = calloc((cols + 1), sizeof(char *));
+		if (homeworkelems[e] == NULL)
+			return NULL;
+	}
 	homeworkelems[lines] = NULL;
 	elem = malloc((BUFSIZ * sizeof(char)));
 
