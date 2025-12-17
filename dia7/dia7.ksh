@@ -28,14 +28,14 @@ input="$1"
 splinters=0
 for ((nl=0; ;nl++)); do
 	if read l; then
-		T[nl]="$l"
-		for ((c=0; c<${#T[nl]}; c++)); do
-			case "${T[nl]:$c:1}" in
+		for ((c=0; c<${#l}; c++)); do
+			T[nl][c]="${l:$c:1}"
+			case "${T[nl][c]}" in
 				'S') Spos=($nl $c) ;;
-			       '^') SplintersPos[$splinters]=($nl $c)
-				       ((splinters+= 1)) ;;
-			'.') continue ;;
-		esac
+				'^') SplintersPos[$splinters]=($nl $c)
+					((splinters+= 1)) ;;
+				'.') continue ;;
+			esac
 		done
 	else
 		break
