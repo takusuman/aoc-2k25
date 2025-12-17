@@ -77,7 +77,7 @@
 #include <string.h>
 
 extern char *strdup(const char*);
-char ***gethomeworkline(FILE *f);
+char ***gethomeworklines(FILE *f);
 
 int main(int argc, char *argv[]) {
 	unsigned long int total = 0,
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 	inputfp = fopen(input, "r");
 	if (!inputfp) return -1;
 
-	lines = gethomeworkline(inputfp);
+	lines = gethomeworklines(inputfp);
 	if (lines == NULL)
 		return -1;
 
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-char ***gethomeworkline(FILE *f) {
+char ***gethomeworklines(FILE *f) {
 	int b = 0;
 	char *elem = NULL,
 	     **linebuf = NULL,
