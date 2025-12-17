@@ -187,6 +187,7 @@ char ***gethomeworkline(FILE *f) {
 	homeworkelems = calloc(lines, sizeof(char **));
 	for (e = 0; e < lines; e++)
 		homeworkelems[e] = calloc((cols + 1), sizeof(char *));
+	homeworkelems[lines] = NULL;
 	elem = malloc((BUFSIZ * sizeof(char)));
 
 	/*
