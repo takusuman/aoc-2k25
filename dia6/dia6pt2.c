@@ -47,15 +47,15 @@
  *
  * compile: cc -Wall -std=c99 -O3 -o dia6 dia6pt2.c -pipe
  */
-#define cephalopod_to_human_homework(n, op) ((void)0)
-	/* Just for the love of the game. */
-	//#define cephalopod_to_human_homework(n, op) \
-	//	printf("%d", n); \
-	//	if (m < (maxm - 2)) { \
-	//		putchar(' '); \
-	//		putchar(op); \
-	//		putchar(' '); \
-	//	}
+
+/* Just for the love of the game. */
+#define cephalopod_to_human_homework(n, op) \
+	printf("%d ", atoi(n)); \
+	if (m < (maxm - 2)) { \
+		putchar(' '); \
+		putchar(op); \
+		putchar(' '); \
+	}
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -69,44 +69,46 @@ char **gethomeworkline(FILE *f);
 int main(int argc, char *argv[]) {
 	unsigned long int total = 0,
 		      grandtotal = 0;
-//	size_t linebufsiz = 1,
-//	       i = 0,
-//	       m = 0,
-//	       n = 0,
-//	       maxm = 0,
-//	       maxn = 0;
-//	char op = '\0',
-//	     *input = NULL,
-//	     **line = NULL,
-//		***crudelines;
+	size_t linebufsiz = 1,
+	       i = 0,
+	       m = 0,
+	       n = 0,
+	       maxm = 0,
+	       maxn = 0;
+	char op = '\0',
+	     *input = NULL,
+		***lines;
 	FILE *inputfp = NULL;
 
 	if (argc <= 1) return -1;
-	char *input = argv[1];
+	input = argv[1];
 	inputfp = fopen(input, "r");
 	if (!inputfp) return -1;
 
-	gethomeworkline(inputfp);
-	/* Allocate size dynamically for crudelines[]. */
-//	for (n = 0; n < maxn; n++) {
-//		op = *crudelines[(maxm - 1)][n];
-//		/* total = (op == '*')? 1 : 0; */
-//		total = (op == '*');
-//		for (m = 0; m < (maxm - 1); m++) {
-//			cephalopod_to_human_homework(crudelines[m][n], op);
-//			switch (op) {
-//				case '*':
-//					total *= atoi(crudelines[m][n]);
-//					break;
-//				case '+':
-//					total += atoi(crudelines[m][n]);
-//					break;
-//			}
-//
-//		}
-//		printf("= %ld\n", total);
-//		grandtotal += total;
-//	}
+	lines = gethomeworkline(inputfp);
+	for (maxm = 0; lines[maxm]; maxm++);
+	for (maxn = 0; lines[(maxm - 1)][maxn] != NULL; maxn++);
+	/* Allocate size dynamically for lines[]. */
+	for (n = 0; n < maxn; n++) {
+		op = *lines[(maxm - 1)][n];
+		/* total = (op == '*')? 1 : 0; */
+		total = (op == '*');
+		for (m = 0; m < (maxm - 1); m++) {
+			if (lines[m][n] == NULL) continue;
+			cephalopod_to_human_homework(lines[m][n], op);
+			switch (op) {
+				case '*':
+					total *= atoi(lines[m][n]);
+					break;
+				case '+':
+					total += atoi(lines[m][n]);
+					break;
+			}
+
+		}
+		printf("= %ld\n", total);
+		grandtotal += total;
+	}
 	printf("Grand total: %ld\n", grandtotal);
 
 	fclose(inputfp);
@@ -184,9 +186,9 @@ char **gethomeworkline(FILE *f) {
 	/* Since we're counting from 0. */
 	cols += 1;
 
-	homeworkelems = malloc((lines * sizeof(char **)));
+	homeworkelems = calloc(lines, sizeof(char **));
 	for (e = 0; e < lines; e++)
-		homeworkelems[e] = malloc(cols * sizeof(char *));
+		homeworkelems[e] = calloc((cols + 1), sizeof(char *));
 	elem = malloc((BUFSIZ * sizeof(char)));
 
 	/*
@@ -214,7 +216,6 @@ char **gethomeworkline(FILE *f) {
 			for (lns=0; lns < (lines - 1); lns++)
 				elem[lns] = linebuf[lns][c];
 			elem[(lns + 1)] = '\0';
-			puts(elem);
 			homeworkelems[l][col] = strdup(elem);
 			l += 1;
 		}
@@ -235,11 +236,12 @@ char **gethomeworkline(FILE *f) {
 
 	for (l = 0; l < lines; l++) {
 		for (col = 0; col < cols; col++) {
-			printf("%s ", homeworkelems[l][col]);
+			printf("[%d][%d] = %s\n", l, col, homeworkelems[l][col]);
 		}
-		putchar('\n');
 	}
+	for (e = 0; e < lines; e++)
+		free(linebuf[e]);
 	free(linebuf);
-//	return (l > 0)? homeworkelems : NULL;
-	return NULL;;
+	free(elem);
+	return (l > 0)? homeworkelems : NULL;
 }
