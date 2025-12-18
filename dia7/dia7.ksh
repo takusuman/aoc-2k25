@@ -60,9 +60,9 @@ function find_in_coordinates_list {
 
 function print_matrix {
 	nameref M=$1
-	for ((m=0; m < ${#M[@]}; m++)); do
-		for ((n=0; n < ${#M[m][@]}; n++)); do
-			printf '%c' "${M[m][n]}"
+	for ((i=0; i < ${#M[@]}; i++)); do
+		for ((j=0; j < ${#M[i][@]}; j++)); do
+			printf '%c' "${M[i][j]}"
 		done
 		printf '\n'
 	done
@@ -71,11 +71,23 @@ function print_matrix {
 
 print_matrix T
 
+set -x
 for ((m=0; m < ${#T[@]}; m++)); do
 	for ((n=0; n < ${#T[m][@]}; n++)); do
 		case "${T[m][n]}" in
 			'S') T[(m + 1)][n]='|' ;;
 			'^')
+			print_matrix T
+			printf 'm: %d\nn:% d\n' $m $n 
+			echo "${T[m][n]}"
+			echo "${T[(m - 1)][n]}"
+			echo "${T[(m - 1)][(n - 1)]}"
+			echo "${T[(m - 1)][(n + 2)]}"
+
+			echo "${T[(m - 2)][n]}"
+			echo "${T[(m - 2)][(n - 1)]}"
+			echo "${T[(m - 2)][(n + 2)]}"
+
 			case "${T[(m - 1)][n]}" in
 				'|')
 				# Work left and then right.
@@ -84,7 +96,6 @@ for ((m=0; m < ${#T[@]}; m++)); do
 				((n2l= n2 - 1))
 				((n2r= n2 + 1))
 				for ((m2=$_m2; m2 < ${#T[@]}; m2++)); do
-					echo "${T[m2][n2r]}" $n2l $n2
 					if find_in_coordinates_list SplintersPos $m2 $n2l; then
 						break
 					fi
@@ -93,7 +104,6 @@ for ((m=0; m < ${#T[@]}; m++)); do
 					fi
 				done
 				for ((m2=$_m2; m2 < ${#T[@]}; m2++)); do
-					echo "${T[m2][n2r]}" $n2r $n2
 					if find_in_coordinates_list SplintersPos $m2 $n2r; then
 						break
 					fi
@@ -103,7 +113,6 @@ for ((m=0; m < ${#T[@]}; m++)); do
 					fi
 				done
 				unset m2 n2 n2l n2r ;;
-				*) continue ;;
 			esac ;;
 		esac
 	done
