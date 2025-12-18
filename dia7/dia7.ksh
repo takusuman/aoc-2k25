@@ -81,7 +81,11 @@ for ((m=0; m < ${#T[@]}; m++)); do
 				T[(m + 1)][n]='|'
 				raypath[$raypaths]=( $(($m + 1)) $n )
 				((raypaths+= 1)) ;;
-			'^')	
+			'^')
+				# We should've been able to just check if
+				# T[(m - 1)][n] contained a '|' but, for
+				# some reason, it didn't work, so we now
+				# depend on this slow check. 	
 				find_in_coordinates_list raypath $((m - 1)) $n
 				case $? in
 					0)
