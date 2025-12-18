@@ -1,5 +1,5 @@
 #!/bin/ksh93
-# AoC 2k25, day 7 in KornShell 93.
+# AoC 2k25, day 7 pt. 1 in KornShell 93.
 # Question statement: "You thank the cephalopods
 # for the help and exit the trash compactor,
 # finding yourself in the familiar halls of a
@@ -23,6 +23,9 @@
 # stopped; instead, a new tachyon beam continues
 # from the immediate left and from the immediate
 # right of the splitter.
+#
+# taks note: compile this with shcomp.
+# I think it shall be somewhat faster.
 
 input="$1"
 splinters=0
@@ -82,6 +85,7 @@ for ((m=0; m < ${#T[@]}; m++)); do
 				find_in_coordinates_list raypath $((m - 1)) $n
 				case $? in
 					0)
+					((divided+= 1))
 					# Work left and right
 					n2=$n
 					_m2=$m
@@ -110,7 +114,8 @@ for ((m=0; m < ${#T[@]}; m++)); do
 					done
 					unset m2 n2 n2l n2r ;;
 					*)
-					echo 'Não acertado.'
+					printf 'Não acertado na posição (%d, %d).\n' \
+						$m $n
 					continue ;;
 				esac ;;
 		esac
@@ -118,3 +123,4 @@ for ((m=0; m < ${#T[@]}; m++)); do
 done
 
 print_matrix T
+printf 'Vezes em que o raio foi dividido: %d\n' $divided
