@@ -43,6 +43,18 @@ for ((nl=0; ;nl++)); do
 done <"$input"
 unset l
 
+function find_in_coordinates_list {
+	nameref coordes=$1
+	m="$2"
+	n="$3"
+	for ((i=0; i <${#coordes[@]}; i++)); do
+		if (( ${coordes[$i][0]} == $m )) && (( ${coordes[$i][1]} == $n )); then
+			return 0
+		fi
+	done
+	return 1
+}
+
 function print_matrix {
 	nameref M=$1
 	for ((m=0; m < ${#M[@]}; m++)); do
@@ -64,17 +76,17 @@ for ((m=0; m < ${#T[@]}; m++)); do
 			case "${T[(m - 1)][n]}" in
 				'|')
 				for ((m2=m; m2 < ${#T[@]}; m2++)); do
-					if [[ ${T[m2][(n - 1)]} == '^' ||
-						${T[m2][(n + 1)]} == '^' ]]; then
-						break
+					if [[ ${T[m2][(n - 1)]} == '.' ]]; then
+						T[m2][(n - 1)]='|'
 					fi
-					T[m2][(n - 1)]='|'
-					T[m2][(n + 1)]='|'
+					if [[ ${T[m2][(n + 1)]} == '.' ]]; then
+						T[m2][(n + 1)]='|'
+					fi
 				done ;;
 				*) continue ;;
 			esac ;;
 		esac
 	done
 done
-
+#! find_in_coordinates_list SplintersPos $m2 $n
 print_matrix T
