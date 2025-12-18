@@ -31,9 +31,11 @@ for ((nl=0; ;nl++)); do
 		for ((c=0; c<${#l}; c++)); do
 			T[nl][c]="${l:$c:1}"
 			case "${T[nl][c]}" in
-				'S') Spos=($nl $c) ;;
+				'S') Spos=($nl $c) 
+					continue ;;
 				'^') SplintersPos[$splinters]=($nl $c)
-					((splinters+= 1)) ;;
+					((splinters+= 1)) 
+					continue ;;
 				'.') continue ;;
 			esac
 		done
@@ -50,9 +52,10 @@ function find_in_coordinates_list {
 	for ((i=0; i <${#coordes[@]}; i++)); do
 		if (( ${coordes[$i][0]} == $m )) && (( ${coordes[$i][1]} == $n )); then
 			return 0
+			break
 		fi
 	done
-	return 1
+	return 255
 }
 
 function print_matrix {
@@ -68,6 +71,12 @@ function print_matrix {
 
 print_matrix T
 
+for ((i=0; i <${#SplintersPos[@]}; i++)); do
+	printf '%d, %d:  %s\n' \
+		${SplintersPos[$i][0]} ${SplintersPos[$i][1]} \
+		${T[${SplintersPos[$i][0]}][${SplintersPos[$i][1]}]}
+done
+
 for ((m=0; m < ${#T[@]}; m++)); do
 	for ((n=0; n < ${#T[m][@]}; n++)); do
 		case "${T[m][n]}" in
@@ -75,18 +84,33 @@ for ((m=0; m < ${#T[@]}; m++)); do
 			'^')
 			case "${T[(m - 1)][n]}" in
 				'|')
+				# Work left and then right.
+				n2=n
+				((n2l= n2 - 1))
+				((n2r= n2 + 1))
 				for ((m2=m; m2 < ${#T[@]}; m2++)); do
-					if [[ ${T[m2][(n - 1)]} == '.' ]]; then
-						T[m2][(n - 1)]='|'
+					if find_in_coordinates_list SplintersPos $m2 $n2l; then
+						break
 					fi
-					if [[ ${T[m2][(n + 1)]} == '.' ]]; then
-						T[m2][(n + 1)]='|'
+					if [[ ${T[m2][n2l]} == '.' ]]; then
+
+						T[m2][n2l]='|'
 					fi
-				done ;;
+				done
+				for ((m2=m; m2 < ${#T[@]}; m2++)); do
+					if find_in_coordinates_list SplintersPos $m2 $n2r; then
+						break
+					fi
+					if [[ ${T[m2][n2r]} == '.' ]]; then
+						T[m2][n2r]='|'
+					fi
+				done
+				unset m2 n2 n2l n2r 
+				break ;;
 				*) continue ;;
 			esac ;;
 		esac
 	done
 done
-#! find_in_coordinates_list SplintersPos $m2 $n
+
 print_matrix T
