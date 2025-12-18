@@ -47,10 +47,10 @@ unset l
 
 function find_in_coordinates_list {
 	nameref coordes=$1
-	m="$2"
-	n="$3"
+	melem="$2"
+	nelem="$3"
 	for ((i=0; i <${#coordes[@]}; i++)); do
-		if (( ${coordes[$i][0]} == $m )) && (( ${coordes[$i][1]} == $n )); then
+		if (( ${coordes[$i][0]:--1} == $melem )) && (( ${coordes[$i][1]:--1} == $nelem )); then
 			return 0
 			break
 		fi
@@ -71,49 +71,45 @@ function print_matrix {
 
 print_matrix T
 
-set -x
 for ((m=0; m < ${#T[@]}; m++)); do
 	for ((n=0; n < ${#T[m][@]}; n++)); do
 		case "${T[m][n]}" in
-			'S') T[(m + 1)][n]='|' ;;
+			'S')
+				T[(m + 1)][n]='|'
+				raypath[$raypaths]=( $(($m + 1)) $n )
+				((raypaths+= 1)) ;;
 			'^')
-			print_matrix T
-			printf 'm: %d\nn:% d\n' $m $n 
-			echo "${T[m][n]}"
-			echo "${T[(m - 1)][n]}"
-			echo "${T[(m - 1)][(n - 1)]}"
-			echo "${T[(m - 1)][(n + 2)]}"
+				if ! find_in_coordinates_list raypath $((m - 1)) $n; then
+					continue
+				else
+					# Work left and right
+					n2=$n
+					_m2=$m
+					((n2l= n2 - 1))
+					((n2r= n2 + 1))
+					for ((m2=$_m2; m2 < ${#T[@]}; m2++)); do
+						if find_in_coordinates_list SplintersPos $m2 $n2l; then
+							break
+						fi
+						if [[ ${T[m2][n2l]} == '.' ]]; then
+							T[m2][n2l]='|'
+							raypath[$raypaths]=( $m2 $n2l )
+							((raypaths+= 1))
+						fi
+					done
+					for ((m2=$_m2; m2 < ${#T[@]}; m2++)); do
+						if find_in_coordinates_list SplintersPos $m2 $n2r; then
+							break
+						fi
 
-			echo "${T[(m - 2)][n]}"
-			echo "${T[(m - 2)][(n - 1)]}"
-			echo "${T[(m - 2)][(n + 2)]}"
-
-			case "${T[(m - 1)][n]}" in
-				'|')
-				# Work left and then right.
-				n2=$n
-				_m2=$m
-				((n2l= n2 - 1))
-				((n2r= n2 + 1))
-				for ((m2=$_m2; m2 < ${#T[@]}; m2++)); do
-					if find_in_coordinates_list SplintersPos $m2 $n2l; then
-						break
-					fi
-					if [[ ${T[m2][n2l]} == '.' ]]; then
-						T[m2][n2l]='|'
-					fi
-				done
-				for ((m2=$_m2; m2 < ${#T[@]}; m2++)); do
-					if find_in_coordinates_list SplintersPos $m2 $n2r; then
-						break
-					fi
-
-					if [[ "${T[m2][n2r]}" == '.' ]]; then
-						T[m2][n2r]='|'
-					fi
-				done
-				unset m2 n2 n2l n2r ;;
-			esac ;;
+						if [[ "${T[m2][n2r]}" == '.' ]]; then
+							T[m2][n2r]='|'
+							raypath[$raypaths]=( $m2 $n2r )
+							((raypaths+= 1))
+						fi
+					done
+					unset m2 n2 n2l n2r
+				fi ;;
 		esac
 	done
 done
