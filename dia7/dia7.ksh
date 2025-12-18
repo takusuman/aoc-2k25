@@ -78,10 +78,10 @@ for ((m=0; m < ${#T[@]}; m++)); do
 				T[(m + 1)][n]='|'
 				raypath[$raypaths]=( $(($m + 1)) $n )
 				((raypaths+= 1)) ;;
-			'^')
-				if ! find_in_coordinates_list raypath $((m - 1)) $n; then
-					continue
-				else
+			'^')	
+				find_in_coordinates_list raypath $((m - 1)) $n
+				case $? in
+					0)
 					# Work left and right
 					n2=$n
 					_m2=$m
@@ -108,8 +108,11 @@ for ((m=0; m < ${#T[@]}; m++)); do
 							((raypaths+= 1))
 						fi
 					done
-					unset m2 n2 n2l n2r
-				fi ;;
+					unset m2 n2 n2l n2r ;;
+					*)
+					echo 'Não acertado.'
+					continue ;;
+				esac ;;
 		esac
 	done
 done
