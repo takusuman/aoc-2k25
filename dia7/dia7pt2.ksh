@@ -98,6 +98,7 @@ print_matrix T
 # just how many times did a ray go through a
 # column. It starts at S, so get the column for S.
 ((rayway[${Spos[1]}]= 1 ))
+((ways+= 1 ))
 
 for ((s=0; s<${#SplintersPos[@]}; s++)); do
 	n=${SplintersPos[s][1]}
@@ -108,6 +109,7 @@ for ((s=0; s<${#SplintersPos[@]}; s++)); do
 	# value, so we know if a ray has hit this
 	# splinter before.
 	((timescurrentlyin=${rayway[$n]} ))
+	((ways-= timescurrentlyin))
 	((rayway[$n]=0 ))
 
 	# Now count for left and right, or better yet,
@@ -115,15 +117,8 @@ for ((s=0; s<${#SplintersPos[@]}; s++)); do
 	# many times can it pass by one of these two:
 	((rayway[$((n - 1))]+= timescurrentlyin))
 	((rayway[$((n + 1))]+= timescurrentlyin))
+	((ways+= (timescurrentlyin * 2)))
 	unset timescurrentlyin
-done
-
-# At first, I thought we could've just save it to
-# 'ways' directly, but there's the fact that we
-# need to zero out the column if there's a
-# splinter on it.
-for ((w=0; w<${#rayway[@]}; w++)); do
-	((ways+= ${rayway[w]}))
 done
 
 printf 'Número de caminhos que o raio pôde percorrer até o fim: %d\n' $ways
