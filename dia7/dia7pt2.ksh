@@ -118,5 +118,12 @@ for ((s=0; s<${#SplintersPos[@]}; s++)); do
 	unset timescurrentlyin
 done
 
-print -C rayway
+# At first, I thought we could've just save it to
+# 'ways' directly, but there's the fact that we
+# need to zero out the column if there's a
+# splinter on it.
+for ((w=0; w<${#rayway[@]}; w++)); do
+	((ways+= ${rayway[w]}))
+done
+
 printf 'Número de caminhos que o raio pôde percorrer até o fim: %d\n' $ways
