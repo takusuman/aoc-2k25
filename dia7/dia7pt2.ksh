@@ -1,6 +1,6 @@
 #!/bin/ksh93
 # AoC 2k25, day 7 pt. 2 in KornShell 93.
-# Question statement: 
+# Question statement:
 # Part 1:
 # "You thank the cephalopods
 # for the help and exit the trash compactor,
@@ -25,7 +25,7 @@
 # stopped; instead, a new tachyon beam continues
 # from the immediate left and from the immediate
 # right of the splitter.
-# 
+#
 # Part 2:
 # "With your analysis of the manifold complete,
 # you begin fixing the teleporter. However, as
@@ -35,7 +35,7 @@
 # manifold - it's a quantum tachyon manifold."
 #
 # In other words, your (my) work was useless!
-# 
+#
 # "With a quantum tachyon manifold, only a single
 # tachyon particle is sent through the manifold.
 # A tachyon particle takes both the left and
@@ -50,6 +50,14 @@
 #
 # taks note: compile this with shcomp.
 # I think it shall be somewhat faster.
+# taks 2nd. note: I've "borrowed" part of
+# this algorithm from a fella named Eris
+# Nihila and tried to document it since I
+# frankly couldn't figure out the part 2
+# and, after reading his approach, I
+# realized that it was a really great way
+# to solve this problem and couldn't think
+# of a new one.
 
 input="$1"
 splinters=0
@@ -72,19 +80,6 @@ for ((nl=0; ;nl++)); do
 done <"$input"
 unset l
 
-function find_in_coordinates_list {
-	nameref coordes=$1
-	melem="$2"
-	nelem="$3"
-	for ((i=0; i <${#coordes[@]}; i++)); do
-		if (( ${coordes[$i][0]:--1} == $melem )) && (( ${coordes[$i][1]:--1} == $nelem )); then
-			return 0
-			break
-		fi
-	done
-	return 255
-}
-
 function print_matrix {
 	nameref M=$1
 	for ((i=0; i < ${#M[@]}; i++)); do
@@ -105,15 +100,22 @@ for ((m=0; m < ${#T[@]}; m++)); do
 				# Now, instead of calculating the trajectory
 				# of the ray as a coordinate, we calculate
 				# just how many times did a ray go through a
-				# column. 
-				rayway[$n]=1 ;;
+				# column.
+				((rayway[$n]= 1 ));;
 			'^') 	# Nullify the current column since there shall
 				# not exist any ray coming directly from below
-				# the splinter.
-				rayway[$n]=0
-				
-				rayway[$((n - 1))]=1
-				rayway[$((n + 2))]=1
+				# the splinter but, before that, store its
+				# value, so we know if a ray has hit this
+				# splinter before.
+				((timescurrentlyin=${rayway[$n]} ))
+				((rayway[$n]=0 ))
+
+				# Now count for left and right, or better yet,
+				# left or right, since we're considerying how
+				# many times can it pass by one of these two:
+				((rayway[$((n - 1))]+= timescurrentlyin))
+				((rayway[$((n + 1))]+= timescurrentlyin))
+				unset timescurrentlyin
 				;;
 		esac
 	done
