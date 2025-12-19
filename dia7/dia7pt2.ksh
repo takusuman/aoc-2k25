@@ -53,8 +53,8 @@
 # taks 2nd. note: I've "borrowed" part of
 # this algorithm from a fella named Eris
 # Nihila and tried to document it since I
-# frankly couldn't figure out the part 2
-# and, after reading his approach, I
+# frankly couldn't figure out the part 2 per
+# myself and, after reading his approach, I
 # realized that it was a really great way
 # to solve this problem and couldn't think
 # of a new one.
@@ -93,32 +93,30 @@ function print_matrix {
 
 print_matrix T
 
-for ((m=0; m < ${#T[@]}; m++)); do
-	for ((n=0; n < ${#T[m][@]}; n++)); do
-		case "${T[m][n]}" in
-			'S')
-				# Now, instead of calculating the trajectory
-				# of the ray as a coordinate, we calculate
-				# just how many times did a ray go through a
-				# column.
-				((rayway[$n]= 1 ));;
-			'^') 	# Nullify the current column since there shall
-				# not exist any ray coming directly from below
-				# the splinter but, before that, store its
-				# value, so we know if a ray has hit this
-				# splinter before.
-				((timescurrentlyin=${rayway[$n]} ))
-				((rayway[$n]=0 ))
+# Now, instead of calculating the trajectory
+# of the ray as a coordinate, we calculate
+# just how many times did a ray go through a
+# column. It starts at S, so get the column for S.
+((rayway[${Spos[1]}]= 1 ))
 
-				# Now count for left and right, or better yet,
-				# left or right, since we're considerying how
-				# many times can it pass by one of these two:
-				((rayway[$((n - 1))]+= timescurrentlyin))
-				((rayway[$((n + 1))]+= timescurrentlyin))
-				unset timescurrentlyin
-				;;
-		esac
-	done
+for ((s=0; s<${#SplintersPos[@]}; s++)); do
+	n=${SplintersPos[s][1]}
+
+	# Nullify the current column since there shall
+	# not exist any ray coming directly from below
+	# the splinter but, before that, store its
+	# value, so we know if a ray has hit this
+	# splinter before.
+	((timescurrentlyin=${rayway[$n]} ))
+	((rayway[$n]=0 ))
+
+	# Now count for left and right, or better yet,
+	# left or right, since we're considerying how
+	# many times can it pass by one of these two:
+	((rayway[$((n - 1))]+= timescurrentlyin))
+	((rayway[$((n + 1))]+= timescurrentlyin))
+	unset timescurrentlyin
 done
+
 print -C rayway
 printf 'Número de caminhos que o raio pôde percorrer até o fim: %d\n' $ways
